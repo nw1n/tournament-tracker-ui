@@ -16,6 +16,16 @@ const timerColorVal = ref('inherit')
 
 let timer = null
 
+const clearTimerInterval = () => {
+    if (timer) {
+        try {
+            clearInterval(timer)
+        } catch (e) {
+            console.log(e)
+        }
+    }
+}
+
 const updateTimeRemaining = () => {
     const roundTime = uiStore.roundTimeLength
     const timePassed = tournament.timePassedSinceStartOfCurrentRound(tournament.roundNr)
@@ -24,6 +34,7 @@ const updateTimeRemaining = () => {
     if (timeRemainingMs < 0) {
         timeRemaining.value = '00:00'
         timerColorVal.value = '#ff5555'
+        clearTimerInterval()
         return
     }
 
@@ -35,13 +46,7 @@ const updateTimeRemaining = () => {
 }
 
 const initTimerRender = () => {
-    if (timer) {
-        try {
-            clearInterval(timer)
-        } catch (e) {
-            console.log(e)
-        }
-    }
+    clearTimerInterval()
     updateTimeRemaining()
     setTimeout(updateTimeRemaining, 1000)
     setTimeout(updateTimeRemaining, 2000)
@@ -56,13 +61,7 @@ onMounted(() => {
 
 onUnmounted(() => {
     console.log(`the round component is now unmounted.`)
-    if (timer) {
-        try {
-            clearInterval(timer)
-        } catch (e) {
-            console.log(e)
-        }
-    }
+    clearTimerInterval()
 })
 
 const initRoundEnd = () => {
