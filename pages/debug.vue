@@ -1,28 +1,20 @@
 <script setup>
 import { onMounted, onUnmounted } from 'vue'
 import { useTournamentStore } from '@/stores/main'
+import { ServerApi } from '@/lib/ServerApi'
 
 definePageMeta({
     layout: 'debug',
 })
 
-// onMounted(() => {
-//     console.log('mounted')
-//     fetch('http://bimbamdingdong.net:5000/')
-//         .then((response) => {
-//             if (!response.ok) {
-//                 throw new Error('Network response was not ok')
-//             }
-//             return response.json()
-//         })
-//         .then((data) => {
-//             console.log('response data')
-//             console.log(data)
-//         })
-//         .catch((error) => {
-//             console.error('There was a problem with the fetch operation:', error)
-//         })
-// })
+onMounted(() => {
+    console.log('mounted')
+    const fetchData = async () => {
+        const data = await ServerApi.getInstance().fetchAllServerData()
+        console.log(data)
+    }
+    fetchData()
+})
 
 const tournament = useTournamentStore()
 </script>
