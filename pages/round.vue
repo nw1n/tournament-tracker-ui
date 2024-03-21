@@ -78,12 +78,36 @@ const endRound = () => {
     initTimerRender()
 }
 
+const saveDataToSerer = () => {
+    console.log('saving data to server')
+    const hostUrl = 'http://localhost:5000/'
+    const url = hostUrl + 'save-tournament/'
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            tournament: JSON.stringify(tournament.matches),
+        }),
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            console.log('Success:', data)
+        })
+        .catch((error) => {
+            console.error('Error:', error)
+        })
+}
+
 const endTournament = () => {
     tournament.endRound()
+    saveDataToSerer()
     navigateTo('/end')
 }
 
 const ignoreRoundAndEndTournament = () => {
+    saveDataToSerer()
     navigateTo('/end')
 }
 </script>
