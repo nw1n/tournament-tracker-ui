@@ -1,9 +1,28 @@
 <script setup>
+import { onMounted, onUnmounted } from 'vue'
 import { useTournamentStore } from '@/stores/main'
 
 definePageMeta({
     layout: 'debug',
 })
+
+// onMounted(() => {
+//     console.log('mounted')
+//     fetch('http://bimbamdingdong.net:5000/')
+//         .then((response) => {
+//             if (!response.ok) {
+//                 throw new Error('Network response was not ok')
+//             }
+//             return response.json()
+//         })
+//         .then((data) => {
+//             console.log('response data')
+//             console.log(data)
+//         })
+//         .catch((error) => {
+//             console.error('There was a problem with the fetch operation:', error)
+//         })
+// })
 
 const tournament = useTournamentStore()
 </script>
