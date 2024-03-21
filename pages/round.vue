@@ -162,5 +162,8 @@ const ignoreRoundAndEndTournament = () => {
 #timer-time {
     transition: color 200ms;
 }
+.player-section button {
+    @apply text-4xl mt-2 mr-2 w-10;
+}
 </style>
 ```
