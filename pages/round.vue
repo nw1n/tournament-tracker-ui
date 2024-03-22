@@ -90,6 +90,7 @@ const saveDataToSerer = () => {
         },
         body: JSON.stringify({
             tournament: JSON.stringify(tournament.matches),
+            password: settings.password,
         }),
     })
         .then((response) => response.json())

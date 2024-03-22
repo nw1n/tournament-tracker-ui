@@ -5,6 +5,7 @@ import _ from 'lodash'
 export const useSettingsStore = defineStore('settings', {
     state: () => ({
         serverUrl: 'http://localhost:5000',
+        password: '',
         roundTimeMinutes: 30,
         isDebugMode: false,
     }),

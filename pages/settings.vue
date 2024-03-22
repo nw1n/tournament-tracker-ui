@@ -14,6 +14,10 @@ const settings = useSettingsStore()
             <input type="text" v-model="settings.serverUrl" class="border p-2 w-64" />
         </div>
         <div>
+            <div class="mt-8">Password:</div>
+            <input type="text" v-model="settings.password" class="border p-2 w-64" />
+        </div>
+        <div>
             <div class="mt-8">Debug Mode</div>
             <input type="checkbox" v-model="settings.isDebugMode" />
         </div>
