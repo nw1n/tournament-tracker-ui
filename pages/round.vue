@@ -1,12 +1,14 @@
 <script setup>
 import { useTournamentStore } from '@/stores/main'
 import { useUiStore } from '@/stores/ui'
+import { useSettingsStore } from '@/stores/settings'
 import { millisecondsToTime } from '../lib/Util'
 import { onMounted, onUnmounted } from 'vue'
 import { set } from 'lodash'
 
 const tournament = useTournamentStore()
 const uiStore = useUiStore()
+const settings = useSettingsStore()
 
 const isEndRoundMenuOpen = ref(false)
 
@@ -27,9 +29,8 @@ const clearTimerInterval = () => {
 }
 
 const updateTimeRemaining = () => {
-    const roundTime = uiStore.roundTimeLength
     const timePassed = tournament.timePassedSinceStartOfCurrentRound(tournament.roundNr)
-    const timeRemainingMs = roundTime - timePassed
+    const timeRemainingMs = settings.roundTimeInMilliSeconds - timePassed
 
     if (timeRemainingMs < 0) {
         timeRemaining.value = '00:00'
@@ -127,7 +128,7 @@ const ignoreRoundAndEndTournament = () => {
                     </div> -->
                     <div>
                         Round Length:
-                        {{ millisecondsToTime(uiStore.roundTimeLength) }}
+                        {{ millisecondsToTime(settings.roundTimeMinutes) }}
                     </div>
                     <div class="pt-6">
                         Time Remaining:

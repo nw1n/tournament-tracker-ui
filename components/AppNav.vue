@@ -4,7 +4,8 @@ const tournament = useTournamentStore()
 
 const nav = [
     { name: 'Start', path: '/' },
-    { name: 'IndexDebug', path: '/debug' },
+    { name: 'Settings', path: '/settings' },
+    { name: 'Debug', path: '/debug' },
     { name: 'Players', path: '/players' },
     { name: 'Round', path: '/round' },
     { name: 'Test', path: '/test' },

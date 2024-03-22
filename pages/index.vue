@@ -1,6 +1,7 @@
 <script setup>
 import { useTournamentStore } from '@/stores/main'
 import { useUiStore } from '@/stores/ui'
+import { useSettingsStore } from '@/stores/settings'
 import { ref } from 'vue'
 
 definePageMeta({
@@ -9,11 +10,9 @@ definePageMeta({
 
 const tournament = useTournamentStore()
 const ui = useUiStore()
-
-const roundTimeLength = ref(ui.roundTimeLength / 1000 / 60)
+const settings = useSettingsStore()
 
 const startTournament = async () => {
-    ui.roundTimeLength = parseInt(roundTimeLength.value) * 60 * 1000
     tournament.endAndReset()
     tournament.init()
     await navigateTo('/players')
@@ -35,7 +34,10 @@ const startTournament = async () => {
                 </div>
                 <div class="pt-6">
                     <div class="mb-2">Round length in Minutes</div>
-                    <input type="number" v-model="roundTimeLength" class="border p-2 w-24" />
+                    <input type="number" v-model="settings.roundTimeMinutes" class="border p-2 w-24" />
+                </div>
+                <div class="pt-6">
+                    <NuxtLink to="/settings"><button>Settings</button></NuxtLink>
                 </div>
             </div>
         </div>
