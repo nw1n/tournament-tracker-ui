@@ -8,7 +8,8 @@ interface Match {
     player2: string
     score1: number
     score2: number
-    dateStarted: Date
+    dateStarted: number
+    tournamentId: number
 }
 
 export const useTournamentStore = defineStore('tournament', {
@@ -98,7 +99,8 @@ export const useTournamentStore = defineStore('tournament', {
                     player2: pair.length === 2 ? pair[1] : 'BYE',
                     score1: pair.length === 2 ? 0 : 9,
                     score2: 0,
-                    dateStarted: new Date(),
+                    dateStarted: new Date().getTime(),
+                    tournamentId: this.id,
                 })
             }
             this.matches = matches

@@ -81,7 +81,7 @@ const endRound = () => {
 
 const saveDataToSerer = () => {
     console.log('saving data to server')
-    const hostUrl = 'http://localhost:5000/'
+    const hostUrl = settings.serverUrl
     const url = hostUrl + 'save-tournament/'
     fetch(url, {
         method: 'POST',

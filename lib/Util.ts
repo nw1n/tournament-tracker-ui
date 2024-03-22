@@ -6,7 +6,7 @@ export async function sleep(ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-export function formatTime(dateArg: Date | string) {
+export function formatTime(dateArg: Date | string | number) {
     const dateObj = new Date(dateArg)
     return (
         `${dateObj.getHours().toString().padStart(2, '0')}:` +
