@@ -1,4 +1,3 @@
-
 <template>
     <div>
         <div id="cog-icon" class="relative z-40">
@@ -51,7 +50,6 @@ c287 98 506 189 728 303 l118 60 252 -250 c300 -298 314 -307 467 -308 86 0
         <div id="full-screen-menu" class="fixed min-h-screen w-full top-0 left-0 z-30 bg-black text-white flex">
             <div class="m-auto">
                 <h1>MENU</h1>
-                <button @click="closeMenu">Close</button>
             </div>
         </div>
     </div>
