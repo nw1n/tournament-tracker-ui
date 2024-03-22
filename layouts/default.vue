@@ -1,18 +1,19 @@
 <script setup>
 import AppNav from '@/components/AppNav.vue'
+import { useSettingsStore } from '@/stores/settings'
+
+const settings = useSettingsStore()
 </script>
 
 <template>
     <div class="max-w-screen-xl mx-auto px-4 py-8 flex justify-center">
         <main>
             <slot></slot>
+            <div v-if="settings.isDebugMode" class="mt-24">
+                <AppNav />
+            </div>
         </main>
     </div>
-    <!-- <div id="bottom-menu" class="fixed bottom-0 w-full flex p-4 justify-end">
-        <div class="w-8">
-            <Cog />
-        </div>
-    </div> -->
 </template>
 <style>
 button {

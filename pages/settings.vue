@@ -10,8 +10,12 @@ const settings = useSettingsStore()
     <div class="">
         <h1>Settings</h1>
         <div>
-            <div class="mb-2">Server URL</div>
+            <div class="mt-8">Server URL:</div>
             <input type="text" v-model="settings.serverUrl" class="border p-2 w-64" />
+        </div>
+        <div>
+            <div class="mt-8">Debug Mode</div>
+            <input type="checkbox" v-model="settings.isDebugMode" />
         </div>
         <div class="pt-6">
             <NuxtLink to="/"><button>Close Settings</button></NuxtLink>
