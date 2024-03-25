@@ -79,10 +79,19 @@ const endRound = () => {
     initTimerRender()
 }
 
-const saveDataToSerer = () => {
+const trySavingDataToServer = () => {
+    try {
+        saveDataToServer()
+    } catch (e) {
+        console.error('error saving data to server', e)
+    }
+}
+
+const saveDataToServer = () => {
     console.log('saving data to server')
     const hostUrl = settings.serverUrl
-    const url = hostUrl + 'save-tournament/'
+    const url = new URL('save-tournament/', hostUrl)
+    console.log('url', url)
     fetch(url, {
         method: 'POST',
         headers: {
@@ -104,12 +113,12 @@ const saveDataToSerer = () => {
 
 const endTournament = () => {
     tournament.endRound()
-    saveDataToSerer()
+    trySavingDataToServer()
     navigateTo('/end')
 }
 
 const ignoreRoundAndEndTournament = () => {
-    saveDataToSerer()
+    trySavingDataToServer()
     navigateTo('/end')
 }
 </script>
