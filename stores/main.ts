@@ -31,8 +31,11 @@ export const useTournamentStore = defineStore('tournament', {
                 nextByePlayer = getByeRatiosSorted(this.$state)[0].player
             }
 
-            // clone players array
+            // clone players array. MAJOR ISSUE: bad practice using getAllTournamentScores here
             let playersClone = _.cloneDeep(getAllTournamentScores(this.$state) as any[])
+
+            // filter players that are not in players array
+            playersClone = playersClone.filter((p) => players.includes(p.player))
 
             // remove bye player
             if (nextByePlayer) {
@@ -297,9 +300,34 @@ function getByeRatios(state: any) {
     return byeRatios
 }
 
+function getPlayersUniqueFromMatches(matches: Match[]) {
+    const players = [] as string[]
+    for (const match of matches) {
+        if (match.player1 !== 'BYE') {
+            players.push(match.player1)
+        }
+        if (match.player2 !== 'BYE') {
+            players.push(match.player2)
+        }
+    }
+    console.log('players', players)
+    return _.uniq(players)
+}
+
 function getAllTournamentScores(state: any) {
     const result = [] as any[]
-    for (const player of state.players) {
+    const players = state.players.slice()
+
+    // tmp: add players that are not in players array
+    const otherPlayers = getPlayersUniqueFromMatches(state.matches.slice())
+    for (const player of otherPlayers) {
+        if (!players.includes(player)) {
+            players.push(player)
+        }
+    }
+
+    // create result object
+    for (const player of players) {
         const obj = {
             player,
             score: 0,
