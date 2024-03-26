@@ -49,6 +49,14 @@ const startTournament = async () => {
     tournament.createMatchesForRoundWithNoRepeats(tournament.roundNr)
     await navigateTo('/round')
 }
+
+const continueTournament = () => {
+    if (newPlayer.value.trim()) {
+        errorMessage.value = 'Did you forget to add the player? Please press add or empty the input field.'
+        return
+    }
+    navigateTo('/round')
+}
 </script>
 
 <template>
@@ -85,7 +93,10 @@ const startTournament = async () => {
                     Add 12 random players
                 </button>
             </div>
-            <div class="mt-12">
+            <div v-if="tournament.isTournamentInProgress" class="mt-12">
+                <button @click="continueTournament" id="continue-tournament-btn">Continue tournament</button>
+            </div>
+            <div v-else class="mt-12">
                 <button @click="startTournament" id="finish-player-creation-btn">Start tournament</button>
             </div>
         </div>

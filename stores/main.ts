@@ -170,6 +170,7 @@ export const useTournamentStore = defineStore('tournament', {
     },
     getters: {
         isTournamentActive: (state) => state.roundNr > 0,
+        isTournamentInProgress: (state) => state.matches.length > 0,
         isBuyMatch: (state) => (match: Match) => {
             return match.player2 === 'BYE' || match.player1 === 'BYE'
         },

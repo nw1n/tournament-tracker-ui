@@ -121,6 +121,10 @@ const ignoreRoundAndEndTournament = () => {
     trySavingDataToServer()
     navigateTo('/end')
 }
+
+const changePlayers = () => {
+    navigateTo('/players')
+}
 </script>
 
 <template>
@@ -189,6 +193,9 @@ const ignoreRoundAndEndTournament = () => {
                         Cancel this round and end Tournament
                     </button>
                 </div>
+            </div>
+            <div class="mt-24">
+                <button @click="changePlayers" class="">Change Players</button>
             </div>
         </div>
     </div>
