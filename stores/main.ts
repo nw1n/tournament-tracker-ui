@@ -208,6 +208,10 @@ export const useTournamentStore = defineStore('tournament', {
             const diff = currentTime.getTime() - matchDateStarted.getTime()
             return diff
         },
+        finishedMatches: (state) => {
+            const matches = state.matches.filter((m: Match) => m.round <= state.finishedRoundNr)
+            return matches
+        },
     },
     persist: {
         storage: persistedState.localStorage,

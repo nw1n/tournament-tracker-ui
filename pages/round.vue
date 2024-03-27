@@ -98,7 +98,7 @@ const saveDataToServer = () => {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            tournament: JSON.stringify(tournament.matches),
+            tournament: JSON.stringify(tournament.finishedMatches),
             password: settings.password,
         }),
     })
