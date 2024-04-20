@@ -7,7 +7,6 @@ export class MatchMaker {
     public nextByePlayer = ''
     public players: string[] = []
     public playerPairs: string[][] = []
-    public isGoodMatchupsFound = false
 
     constructor(store: TournamentStateExtended) {
         this.store = store
@@ -25,26 +24,27 @@ export class MatchMaker {
         return this.players.length % 2 !== 0
     }
 
-    public createTournamentPlayerScoreMapFilteredForActivePlayersWithoutByePlayer() {
+    public createPlayerScoreMapFilteredForActivePlayersAndBye() {
         // clone players array. MAJOR ISSUE: bad practice using getAllTournamentScores here
         let tournamentPlayerScoreMap = _.cloneDeep(getAllTournamentScores(this.store.$state) as any[])
 
         console.log('tournamentPlayerScoreMap', tournamentPlayerScoreMap)
 
         // filter players that are not in players array
-        const tournamentPlayerScoreMapFilteredForActivePlayers = tournamentPlayerScoreMap.filter((p) =>
+        const playerScoreMapFilteredForActivePlayers = tournamentPlayerScoreMap.filter((p) =>
             this.players.includes(p.player),
         )
 
         // remove bye player
-        const tournamentPlayerScoreMapFilteredForActivePlayersWithoutByePlayer =
-            tournamentPlayerScoreMapFilteredForActivePlayers.filter((p) => {
+        const playerScoreMapFilteredForActivePlayersWithoutByePlayer = playerScoreMapFilteredForActivePlayers.filter(
+            (p) => {
                 if (this.nextByePlayer) {
                     return p.player !== this.nextByePlayer
                 }
                 return true
-            })
-        return tournamentPlayerScoreMapFilteredForActivePlayersWithoutByePlayer
+            },
+        )
+        return playerScoreMapFilteredForActivePlayersWithoutByePlayer
     }
 
     public createPlayerPairs(tournamentPlayerScoreMapFilteredForActivePlayersWithoutByePlayer: any[] = []): string[][] {
@@ -123,16 +123,9 @@ export class MatchMaker {
 export class TournamentStoreActions {
     static createMatchesForRound(store: TournamentStateExtended) {
         const matchMaker = new MatchMaker(store)
-
         matchMaker.setNextByePlayer()
-        const tournamentPlayerScoreMapFilteredForActivePlayersWithoutByePlayer =
-            matchMaker.createTournamentPlayerScoreMapFilteredForActivePlayersWithoutByePlayer()
-
-        // try avoid players meeting each other too many times
-        const playerPairs = matchMaker.createPlayerPairs(
-            tournamentPlayerScoreMapFilteredForActivePlayersWithoutByePlayer,
-        )
-
+        const tournamentPlayerScoreMapFiltered = matchMaker.createPlayerScoreMapFilteredForActivePlayersAndBye()
+        const playerPairs = matchMaker.createPlayerPairs(tournamentPlayerScoreMapFiltered)
         matchMaker.persistPlayerPairsToMatches(playerPairs)
     }
 
