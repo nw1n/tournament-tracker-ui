@@ -2,7 +2,7 @@ import _ from 'lodash'
 import type { Match, TournamentState, TournamentStateExtended } from '../stores/tournament'
 import { insertionSortObjs, log } from '~/lib/Util'
 
-export class ActionFns {
+export class TournamentStoreActions {
     static changeScore(self: TournamentStateExtended, round: number, player: string, scoreChange: number = 1) {
         log(`increaseScore round ${round} player ${player}`)
         const matches = _.cloneDeep(self.matches)

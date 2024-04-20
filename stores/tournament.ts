@@ -4,7 +4,7 @@ import _ from 'lodash'
 import {
     getAllTournamentScores,
     getByeRatiosSorted,
-    ActionFns as TournamentStoreActions,
+    TournamentStoreActions,
 } from '~/lib/TournamentStoreFn'
 
 export interface Match {
