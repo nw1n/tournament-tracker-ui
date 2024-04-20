@@ -141,7 +141,7 @@ export const useTournamentStore = defineStore('tournament', {
         // ------------------------------------------------------------------
         isBuyMatch(state): (match: Match) => boolean {
             return (match: Match) => {
-                return match.player2 === 'BYE' || match.player1 === 'BYE'
+                return [match.player1, match.player2].includes('BYE')
             }
         },
 
