@@ -7,6 +7,7 @@ export class MatchMaker {
     public nextByePlayer = ''
     public players: string[] = []
     public playerPairs: string[][] = []
+    public isGoodMatchupsFound = false
 
     constructor(store: TournamentStateExtended) {
         this.store = store
@@ -14,44 +15,41 @@ export class MatchMaker {
     }
 
     public setNextByePlayer() {
+        if (!this.isOddNumberOfPlayers) {
+            return
+        }
         this.nextByePlayer = getByeRatiosSorted(this.store.$state)[0].player
     }
 
     public get isOddNumberOfPlayers() {
         return this.players.length % 2 !== 0
     }
-}
 
-export class TournamentStoreActions {
-    static createMatchesForRound(store: TournamentStateExtended) {
-        const matchMaker = new MatchMaker(store)
-
-        if (matchMaker.isOddNumberOfPlayers) {
-            // find player with least byes
-            matchMaker.setNextByePlayer()
-        }
-
+    public createTournamentPlayerScoreMapFilteredForActivePlayersWithoutByePlayer() {
         // clone players array. MAJOR ISSUE: bad practice using getAllTournamentScores here
-        let tournamentPlayerScoreMap = _.cloneDeep(getAllTournamentScores(store.$state) as any[])
+        let tournamentPlayerScoreMap = _.cloneDeep(getAllTournamentScores(this.store.$state) as any[])
 
         console.log('tournamentPlayerScoreMap', tournamentPlayerScoreMap)
 
         // filter players that are not in players array
         const tournamentPlayerScoreMapFilteredForActivePlayers = tournamentPlayerScoreMap.filter((p) =>
-            store.players.includes(p.player),
+            this.players.includes(p.player),
         )
 
         // remove bye player
         const tournamentPlayerScoreMapFilteredForActivePlayersWithoutByePlayer =
             tournamentPlayerScoreMapFilteredForActivePlayers.filter((p) => {
-                if (matchMaker.nextByePlayer) {
-                    return p.player !== matchMaker.nextByePlayer
+                if (this.nextByePlayer) {
+                    return p.player !== this.nextByePlayer
                 }
                 return true
             })
+        return tournamentPlayerScoreMapFilteredForActivePlayersWithoutByePlayer
+    }
 
+    public createPlayerPairs(tournamentPlayerScoreMapFilteredForActivePlayersWithoutByePlayer: any[] = []): string[][] {
         // try avoid players meeting each other too many times
-        const meets = getNumberOfMeetsBetweenPlayers(store.$state)
+        const meets = getNumberOfMeetsBetweenPlayers(this.store.$state)
         let playersRes = [] as any[]
         let playerPairs = [] as any[]
         let isGoodMatchupsFound = false
@@ -98,23 +96,44 @@ export class TournamentStoreActions {
         }
 
         // if there is a bye player, add it to the end of the array
-        if (matchMaker.nextByePlayer) {
-            playerPairs.push([matchMaker.nextByePlayer])
+        if (this.nextByePlayer) {
+            playerPairs.push([this.nextByePlayer, 'BYE'])
         }
 
-        const matches = [...store.matches] as Match[]
+        return playerPairs
+    }
+
+    public persistPlayerPairsToMatches(playerPairs: string[][]) {
+        const matches = [...this.store.matches] as Match[]
         for (const pair of playerPairs) {
             matches.push({
-                round: store.roundNr,
+                round: this.store.roundNr,
                 player1: pair[0],
-                player2: pair.length === 2 ? pair[1] : 'BYE',
-                score1: pair.length === 2 ? 0 : 9,
+                player2: pair[1],
+                score1: pair[1] === 'BYE' ? 9 : 0,
                 score2: 0,
                 dateStarted: new Date().getTime(),
-                tournamentId: store.id,
+                tournamentId: this.store.id,
             })
         }
-        store.matches = matches
+        this.store.matches = matches
+    }
+}
+
+export class TournamentStoreActions {
+    static createMatchesForRound(store: TournamentStateExtended) {
+        const matchMaker = new MatchMaker(store)
+
+        matchMaker.setNextByePlayer()
+        const tournamentPlayerScoreMapFilteredForActivePlayersWithoutByePlayer =
+            matchMaker.createTournamentPlayerScoreMapFilteredForActivePlayersWithoutByePlayer()
+
+        // try avoid players meeting each other too many times
+        const playerPairs = matchMaker.createPlayerPairs(
+            tournamentPlayerScoreMapFilteredForActivePlayersWithoutByePlayer,
+        )
+
+        matchMaker.persistPlayerPairsToMatches(playerPairs)
     }
 
     static changeScore(self: TournamentStateExtended, round: number, player: string, scoreChange: number = 1) {
