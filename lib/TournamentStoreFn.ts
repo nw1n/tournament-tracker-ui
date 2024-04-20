@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import type { Match, TournamentState, TournamentStateExtended } from '../stores/main'
+import type { Match, TournamentState, TournamentStateExtended } from '../stores/tournament'
 import { log } from '~/lib/Util'
 
 export class ActionFns {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useTournamentStore } from '@/stores/main'
+import { useTournamentStore } from '~/stores/tournament'
 import _ from 'lodash'
 import { unProxy } from '~/lib/Util.js'
 

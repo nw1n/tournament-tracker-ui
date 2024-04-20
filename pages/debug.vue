@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, onUnmounted } from 'vue'
-import { useTournamentStore } from '@/stores/main'
+import { useTournamentStore } from '~/stores/tournament'
 import { ServerApi } from '@/lib/ServerApi'
 
 definePageMeta({

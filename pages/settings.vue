@@ -1,5 +1,5 @@
 <script setup>
-import { useTournamentStore } from '@/stores/main'
+import { useTournamentStore } from '~/stores/tournament'
 import { useSettingsStore } from '@/stores/settings'
 
 const tournament = useTournamentStore()

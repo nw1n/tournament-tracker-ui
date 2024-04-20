@@ -1,5 +1,5 @@
 <script setup>
-import { useTournamentStore } from '@/stores/main'
+import { useTournamentStore } from '~/stores/tournament'
 import { useUiStore } from '@/stores/ui'
 import { useSettingsStore } from '@/stores/settings'
 import { millisecondsToTime } from '../lib/Util'
