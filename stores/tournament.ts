@@ -118,7 +118,7 @@ export const useTournamentStore = defineStore('tournament', {
 
         allTournamentScoresSorted(state): any[] {
             const scores = this.allTournamentScores.slice()
-            return insertionSortObjs(scores, 'score').reverse()
+            return insertionSortObjs(scores, 'score', 'desc')
         },
 
         byeRatios(state) {

@@ -46,7 +46,7 @@ export function millisecondsToTime(ms: number) {
 }
 
 // insertionsort object array
-export function insertionSortObjs(arr: any[], key: string) {
+export function insertionSortObjs(arr: any[], key: string, direction: 'asc' | 'desc' = 'asc') {
     for (let i = 1; i < arr.length; i++) {
         let j = i - 1
         let temp = arr[i]
@@ -55,6 +55,9 @@ export function insertionSortObjs(arr: any[], key: string) {
             j--
         }
         arr[j + 1] = temp
+    }
+    if (direction === 'desc') {
+        arr.reverse()
     }
     return arr
 }
