@@ -83,7 +83,7 @@ export const useTournamentStore = defineStore('tournament', {
         },
 
         createMatchesForRound() {
-            TournamentStoreActions.createMatchesForRound(this, this.roundNr)
+            TournamentStoreActions.createMatchesForRound(this)
         },
 
         endRoundAndCreateNewMatches() {

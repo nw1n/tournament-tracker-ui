@@ -2,28 +2,56 @@ import _ from 'lodash'
 import type { Match, TournamentState, TournamentStateExtended } from '../stores/tournament'
 import { insertionSortObjs, log } from '~/lib/Util'
 
-export class TournamentStoreActions {
-    static createMatchesForRound(self: TournamentStateExtended, roundNr: number) {
-        let nextByePlayer = ''
+export class MatchMaker {
+    public store: TournamentStateExtended
+    public nextByePlayer = ''
+    public players: string[] = []
+    public playerPairs: string[][] = []
 
-        if (self.players.length % 2 !== 0) {
+    constructor(store: TournamentStateExtended) {
+        this.store = store
+        this.players = store.players
+    }
+
+    public setNextByePlayer() {
+        this.nextByePlayer = getByeRatiosSorted(this.store.$state)[0].player
+    }
+
+    public get isOddNumberOfPlayers() {
+        return this.players.length % 2 !== 0
+    }
+}
+
+export class TournamentStoreActions {
+    static createMatchesForRound(store: TournamentStateExtended) {
+        const matchMaker = new MatchMaker(store)
+
+        if (matchMaker.isOddNumberOfPlayers) {
             // find player with least byes
-            nextByePlayer = getByeRatiosSorted(self.$state)[0].player
+            matchMaker.setNextByePlayer()
         }
 
         // clone players array. MAJOR ISSUE: bad practice using getAllTournamentScores here
-        let playersClone = _.cloneDeep(getAllTournamentScores(self.$state) as any[])
+        let tournamentPlayerScoreMap = _.cloneDeep(getAllTournamentScores(store.$state) as any[])
+
+        console.log('tournamentPlayerScoreMap', tournamentPlayerScoreMap)
 
         // filter players that are not in players array
-        playersClone = playersClone.filter((p) => self.players.includes(p.player))
+        const tournamentPlayerScoreMapFilteredForActivePlayers = tournamentPlayerScoreMap.filter((p) =>
+            store.players.includes(p.player),
+        )
 
         // remove bye player
-        if (nextByePlayer) {
-            playersClone = playersClone.filter((p) => p.player !== nextByePlayer)
-        }
+        const tournamentPlayerScoreMapFilteredForActivePlayersWithoutByePlayer =
+            tournamentPlayerScoreMapFilteredForActivePlayers.filter((p) => {
+                if (matchMaker.nextByePlayer) {
+                    return p.player !== matchMaker.nextByePlayer
+                }
+                return true
+            })
 
         // try avoid players meeting each other too many times
-        const meets = getNumberOfMeetsBetweenPlayers(self.$state)
+        const meets = getNumberOfMeetsBetweenPlayers(store.$state)
         let playersRes = [] as any[]
         let playerPairs = [] as any[]
         let isGoodMatchupsFound = false
@@ -31,13 +59,13 @@ export class TournamentStoreActions {
         let i = 0
         for (i = 0; i < 100000; i++) {
             // shuffle players
-            playersClone = _.shuffle(playersClone)
+            const playersCloneShuffled = _.shuffle(tournamentPlayerScoreMapFilteredForActivePlayersWithoutByePlayer)
 
             // sort by score
             // playersClone = insertionSortObjs(playersClone, 'score').reverse()
 
             // create simple player array
-            playersRes = playersClone.map((p) => p.player)
+            playersRes = playersCloneShuffled.map((p) => p.player)
 
             // create matches
             playerPairs = _.chunk(playersRes, 2)
@@ -70,23 +98,23 @@ export class TournamentStoreActions {
         }
 
         // if there is a bye player, add it to the end of the array
-        if (nextByePlayer) {
-            playerPairs.push([nextByePlayer])
+        if (matchMaker.nextByePlayer) {
+            playerPairs.push([matchMaker.nextByePlayer])
         }
 
-        const matches = [...self.matches] as Match[]
+        const matches = [...store.matches] as Match[]
         for (const pair of playerPairs) {
             matches.push({
-                round: roundNr,
+                round: store.roundNr,
                 player1: pair[0],
                 player2: pair.length === 2 ? pair[1] : 'BYE',
                 score1: pair.length === 2 ? 0 : 9,
                 score2: 0,
                 dateStarted: new Date().getTime(),
-                tournamentId: self.id,
+                tournamentId: store.id,
             })
         }
-        self.matches = matches
+        store.matches = matches
     }
 
     static changeScore(self: TournamentStateExtended, round: number, player: string, scoreChange: number = 1) {
