@@ -1,11 +1,7 @@
 import { defineStore } from 'pinia'
 import { formatTime, insertionSortObjs, log } from '~/lib/Util'
 import _ from 'lodash'
-import {
-    getAllTournamentScores,
-    getByeRatiosSorted,
-    TournamentStoreActions,
-} from '~/lib/TournamentStoreFn'
+import { getAllTournamentScores, getByeRatiosSorted, TournamentStoreActions } from '~/lib/TournamentStoreFn'
 
 export interface Match {
     round: number
@@ -82,7 +78,7 @@ export const useTournamentStore = defineStore('tournament', {
             this.finishedRoundNr = this.roundNr
         },
 
-        nextRound() {
+        incrementRoundNr() {
             this.roundNr++
         },
 
@@ -92,7 +88,7 @@ export const useTournamentStore = defineStore('tournament', {
 
         endRoundAndCreateNewMatches() {
             this.endRound()
-            this.nextRound()
+            this.incrementRoundNr()
             this.createMatchesForRound()
         },
 

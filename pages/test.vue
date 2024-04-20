@@ -21,7 +21,7 @@ const startTests = async () => {
     ]
 
     tournament.endRound()
-    tournament.nextRound()
+    tournament.incrementRoundNr()
     tournament.addPlayer('Spieler Fünf')
     tournament.createNewMatches()
     tournament.endRound()
