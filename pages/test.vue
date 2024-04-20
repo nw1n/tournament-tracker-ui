@@ -14,16 +14,32 @@ const startTests = async () => {
         tournament.addPlayer(player)
     })
 
-    const dateNow = new Date()
+    const dateNowInt = new Date().getTime()
     tournament.matches = [
-        { round: 1, dateStarted: dateNow, player1: 'Spieler Eins', player2: 'Spieler Zwei', score1: 2, score2: 0 },
-        { round: 1, dateStarted: dateNow, player1: 'Spieler Drei', player2: 'Spieler Vier', score1: 1, score2: 1 },
+        {
+            round: 1,
+            dateStarted: dateNowInt,
+            player1: 'Spieler Eins',
+            player2: 'Spieler Zwei',
+            score1: 2,
+            score2: 0,
+            tournamentId: dateNowInt,
+        },
+        {
+            round: 1,
+            dateStarted: dateNowInt,
+            player1: 'Spieler Drei',
+            player2: 'Spieler Vier',
+            score1: 1,
+            score2: 1,
+            tournamentId: dateNowInt,
+        },
     ]
 
     tournament.endRound()
     tournament.incrementRoundNr()
     tournament.addPlayer('Spieler Fünf')
-    tournament.createNewMatches()
+    tournament.createMatchesForRound()
     tournament.endRound()
 
     for (let i = 0; i < 4; i++) {
