@@ -23,14 +23,14 @@ export class MatchMaker {
     }
 
     public setNextByePlayer() {
-        if (!this.isOddNumberOfPlayers) {
+        if (this.isEvenNumberOfPlayers) {
             return
         }
         this.nextByePlayer = getByeRatiosSorted(this.store.$state)[0].player
     }
 
-    public get isOddNumberOfPlayers() {
-        return this.players.length % 2 !== 0
+    public get isEvenNumberOfPlayers() {
+        return this.players.length % 2 === 0
     }
 
     public createPlayerScoreMapFilteredForActivePlayersAndBye() {
@@ -59,8 +59,8 @@ export class MatchMaker {
     public createPlayerPairs(tournamentPlayerScoreMapFilteredForActivePlayersWithoutByePlayer: any[] = []): string[][] {
         // try avoid players meeting each other too many times
         const meets = getNumberOfMeetsBetweenPlayers(this.store.$state)
-        let playersRes = [] as any[]
-        let playerPairs = [] as any[]
+
+        let playerPairsSorted: string[][] = []
         let isGoodMatchupsFound = false
 
         let i = 0
@@ -70,29 +70,32 @@ export class MatchMaker {
 
             // sort by score
             // playersClone = insertionSortObjs(playersClone, 'score').reverse()
+
             // create simple player array
-            playersRes = playersCloneShuffled.map((p) => p.player)
+            const playersNameList = playersCloneShuffled.map((p) => p.player)
 
-            // create matches
-            playerPairs = _.chunk(playersRes, 2)
+            // create pairs
+            const playerPairsUnSorted = _.chunk(playersNameList, 2)
 
-            // sort pairs
-            playerPairs = playerPairs.map((pair) => {
+            // sort the two players in each pair by name
+            playerPairsSorted = playerPairsUnSorted.map((pair) => {
                 pair.sort()
                 return pair
             })
 
             // check if players have met too many times
             let hasTooManyMeets = false
-            for (const pair of playerPairs) {
+            for (const pair of playerPairsSorted) {
                 const key = pair.join('-')
                 if (meets[key] > 0) {
                     hasTooManyMeets = true
+                    // break inner for loop
                     break
                 }
             }
             if (!hasTooManyMeets) {
                 isGoodMatchupsFound = true
+                // break outer for loop
                 break
             }
         }
@@ -105,10 +108,10 @@ export class MatchMaker {
 
         // if there is a bye player, add it to the end of the array
         if (this.nextByePlayer) {
-            playerPairs.push([this.nextByePlayer, 'BYE'])
+            playerPairsSorted.push([this.nextByePlayer, 'BYE'])
         }
 
-        return playerPairs
+        return playerPairsSorted
     }
 
     public persistPlayerPairsToMatches(playerPairs: string[][]) {
