@@ -1,6 +1,9 @@
 <script setup>
 import { useTournamentStore } from '@/stores/main'
 import { getRandomName } from '@/lib/getRandomName'
+import { Config } from '@/lib/Config'
+
+//const isDevMode = ref(Config.getInstance().isDevMode)
 
 const tournament = useTournamentStore()
 
@@ -87,12 +90,18 @@ const continueTournament = () => {
                 />
                 <div class="text-red-500">{{ errorMessage }}</div>
                 <button @click="addPlayer" id="add-player-btn" class="mt-2 bg-green-600 text-white">Add player</button>
-                <button @click="add1randomPlayer" id="add-1-random-player-btn" class="mt-2 bg-green-600 text-white">
-                    Add 1 random player
-                </button>
-                <button @click="add12randomPlayers" id="add-12-random-players-btn" class="mt-2 bg-green-600 text-white">
-                    Add 12 random players
-                </button>
+                <template v-if="Config.getInstance().isDevMode">
+                    <button @click="add1randomPlayer" id="add-1-random-player-btn" class="mt-2 bg-green-600 text-white">
+                        Add 1 random player
+                    </button>
+                    <button
+                        @click="add12randomPlayers"
+                        id="add-12-random-players-btn"
+                        class="mt-2 bg-green-600 text-white"
+                    >
+                        Add 12 random players
+                    </button>
+                </template>
             </div>
             <div v-if="tournament.isTournamentInProgress" class="mt-12">
                 <button @click="continueTournament" id="continue-tournament-btn">Continue tournament</button>
