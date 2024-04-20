@@ -104,22 +104,19 @@ export const useTournamentStore = defineStore('tournament', {
         changeScore(round: number, player: string, scoreChange: number) {
             TournamentStoreActions.changeScore(this, round, player, scoreChange)
         },
-        
+
         // Action getters
         // ------------------------------------------------------------------
         getTimePassedSinceStartOfCurrentRound(): number {
             const state = this
-            const roundNr = state.roundNr
-            const match = state.matches.find((m) => m.round === roundNr)
+            const match = state.matches.find((m) => m.round === state.roundNr)
             if (!match || !match.dateStarted) {
-                log('no match or dateStarted found for round', roundNr, match)
+                log('no match or dateStarted found for round', state.roundNr, match)
                 return 0
             }
             const currentTime = new Date()
             const matchDateStarted = new Date(match.dateStarted)
-            log('timePassedSinceStartOfCurrentRound', currentTime, matchDateStarted)
-            const diff = currentTime.getTime() - matchDateStarted.getTime()
-            return diff
+            return currentTime.getTime() - matchDateStarted.getTime()
         },
     },
 
