@@ -104,6 +104,23 @@ export const useTournamentStore = defineStore('tournament', {
         changeScore(round: number, player: string, scoreChange: number) {
             TournamentStoreActions.changeScore(this, round, player, scoreChange)
         },
+        
+        // Action getters
+        // ------------------------------------------------------------------
+        getTimePassedSinceStartOfCurrentRound(): number {
+            const state = this
+            const roundNr = state.roundNr
+            const match = state.matches.find((m) => m.round === roundNr)
+            if (!match || !match.dateStarted) {
+                log('no match or dateStarted found for round', roundNr, match)
+                return 0
+            }
+            const currentTime = new Date()
+            const matchDateStarted = new Date(match.dateStarted)
+            log('timePassedSinceStartOfCurrentRound', currentTime, matchDateStarted)
+            const diff = currentTime.getTime() - matchDateStarted.getTime()
+            return diff
+        },
     },
 
     getters: {
@@ -117,12 +134,6 @@ export const useTournamentStore = defineStore('tournament', {
         // isBuyMatch: (state) => (match: Match) => {
         //     return match.player2 === 'BYE' || match.player1 === 'BYE'
         // },
-        isBuyMatch(state): (match: Match) => boolean {
-            return (match: Match) => {
-                return match.player2 === 'BYE' || match.player1 === 'BYE'
-            }
-        },
-        matchesByRound: (state) => (round: number) => state.matches.filter((m) => m.round === round),
         allTournamentScores: (state) => {
             console.log('allTournamentScores')
             return getAllTournamentScores(state)
@@ -142,20 +153,20 @@ export const useTournamentStore = defineStore('tournament', {
             }
             return formatTime(match.dateStarted)
         },
-        timePassedSinceStartOfCurrentRound: (state) => (roundNr: number) => {
-            const match = state.matches.find((m) => m.round === roundNr)
-            if (!match || !match.dateStarted) {
-                return undefined
-            }
-            const currentTime = new Date()
-            const matchDateStarted = new Date(match.dateStarted)
-            console.log('timePassedSinceStartOfCurrentRound', currentTime, matchDateStarted)
-            const diff = currentTime.getTime() - matchDateStarted.getTime()
-            return diff
+        finishedMatches(state): Match[] {
+            return state.matches.filter((m: Match) => m.round <= state.finishedRoundNr)
         },
-        finishedMatches: (state) => {
-            const matches = state.matches.filter((m: Match) => m.round <= state.finishedRoundNr)
-            return matches
+
+        // getters with argument
+        // ------------------------------------------------------------------
+        isBuyMatch(state): (match: Match) => boolean {
+            return (match: Match) => {
+                return match.player2 === 'BYE' || match.player1 === 'BYE'
+            }
+        },
+
+        matchesByRound(state): (round: number) => Match[] {
+            return (round: number) => state.matches.filter((m) => m.round === round)
         },
     },
 })

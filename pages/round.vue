@@ -29,7 +29,7 @@ const clearTimerInterval = () => {
 }
 
 const updateTimeRemaining = () => {
-    const timePassed = tournament.timePassedSinceStartOfCurrentRound(tournament.roundNr)
+    const timePassed = tournament.getTimePassedSinceStartOfCurrentRound()
     const timeRemainingMs = settings.roundTimeInMilliSeconds - timePassed
 
     if (timeRemainingMs < 0) {
@@ -136,10 +136,6 @@ const changePlayers = () => {
                 </h3>
                 <div class="text-xs text-gray-600 mt-2">
                     <div>Started {{ tournament.timeRoundStarted(tournament.roundNr) }}</div>
-                    <!-- <div>
-                        Time Passed:
-                        {{ millisecondsToTime(tournament.timePassedSinceStartOfCurrentRound(tournament.roundNr)) }}
-                    </div> -->
                     <div>
                         Round Length:
                         {{ millisecondsToTime(settings.roundTimeMinutes) }}
