@@ -23,7 +23,7 @@ export interface TournamentState {
     roundNr: number
     finishedRoundNr: number
     players: string[]
-    startDate: Date | undefined
+    startDate?: Date
     id: number
     matches: Match[]
 }
@@ -36,19 +36,12 @@ export const useTournamentStore = defineStore('tournament', {
     state: (): TournamentState => ({
         roundNr: 0,
         finishedRoundNr: 0,
-        players: [] as string[],
-        startDate: undefined as Date | undefined,
+        players: [],
+        startDate: undefined,
         id: 0,
-        matches: [] as Match[],
+        matches: [],
     }),
     actions: {
-        init() {
-            log('Initializing tournament')
-            this.reset()
-            this.roundNr = 1
-            this.startDate = new Date()
-            this.id = this.startDate.getTime()
-        },
         reset() {
             this.roundNr = 0
             this.finishedRoundNr = 0
@@ -56,6 +49,13 @@ export const useTournamentStore = defineStore('tournament', {
             this.startDate = undefined
             this.id = 0
             this.matches = []
+        },
+        init() {
+            log('Initializing tournament')
+            this.reset()
+            this.roundNr = 1
+            this.startDate = new Date()
+            this.id = this.startDate.getTime()
         },
         endAndReset() {
             this.reset()
