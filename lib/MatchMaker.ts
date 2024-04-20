@@ -5,32 +5,26 @@ import { getByeRatiosSorted, getAllTournamentScores, getNumberOfMeetsBetweenPlay
 
 export class MatchMaker {
     public store: TournamentStateExtended
-    public nextByePlayer = ''
-    public players: string[] = []
+    public byePlayer = ''
     public playerPairs: string[][] = []
 
     constructor(store: TournamentStateExtended) {
         this.store = store
-        this.players = store.players
     }
 
     public run() {
-        this.setNextByePlayer()
+        this.setByePlayer()
         const playerScoreMapFilteredForActivePlayersWithoutByePlayer =
             this.createPlayerScoreMapFilteredForActivePlayersAndBye()
         this.playerPairs = this.createPlayerPairs(playerScoreMapFilteredForActivePlayersWithoutByePlayer)
         this.persistPlayerPairsToMatches(this.playerPairs)
     }
 
-    public setNextByePlayer() {
+    public setByePlayer() {
         if (this.isEvenNumberOfPlayers) {
             return
         }
-        this.nextByePlayer = getByeRatiosSorted(this.store.$state)[0].player
-    }
-
-    public get isEvenNumberOfPlayers() {
-        return this.players.length % 2 === 0
+        this.byePlayer = this.getPlayerWithHighestByeRatio()
     }
 
     public createPlayerScoreMapFilteredForActivePlayersAndBye() {
@@ -41,14 +35,14 @@ export class MatchMaker {
 
         // filter players that are not in players array
         const playerScoreMapFilteredForActivePlayers = tournamentPlayerScoreMap.filter((p) =>
-            this.players.includes(p.player),
+            this.store.players.includes(p.player),
         )
 
         // remove bye player
         const playerScoreMapFilteredForActivePlayersWithoutByePlayer = playerScoreMapFilteredForActivePlayers.filter(
             (p) => {
-                if (this.nextByePlayer) {
-                    return p.player !== this.nextByePlayer
+                if (this.byePlayer) {
+                    return p.player !== this.byePlayer
                 }
                 return true
             },
@@ -107,8 +101,8 @@ export class MatchMaker {
         }
 
         // if there is a bye player, add it to the end of the array
-        if (this.nextByePlayer) {
-            playerPairsSorted.push([this.nextByePlayer, 'BYE'])
+        if (this.byePlayer) {
+            playerPairsSorted.push([this.byePlayer, 'BYE'])
         }
 
         return playerPairsSorted
@@ -128,5 +122,14 @@ export class MatchMaker {
             })
         }
         this.store.matches = matches
+    }
+
+    public get isEvenNumberOfPlayers() {
+        return this.store.players.length % 2 === 0
+    }
+
+    public getPlayerWithHighestByeRatio(): string {
+        const byeRatiosSorted = getByeRatiosSorted(this.store.$state)
+        return byeRatiosSorted[0].player
     }
 }
