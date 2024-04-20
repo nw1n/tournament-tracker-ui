@@ -135,7 +135,7 @@ const changePlayers = () => {
                     Round <strong>{{ tournament.roundNr }}</strong>
                 </h3>
                 <div class="text-xs text-gray-600 mt-2">
-                    <div>Started {{ tournament.timeRoundStarted(tournament.roundNr) }}</div>
+                    <div>Started {{ tournament.timeCurrentRoundStarted }}</div>
                     <div>
                         Round Length:
                         {{ millisecondsToTime(settings.roundTimeMinutes) }}

@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import type { Match, TournamentState, TournamentStateExtended } from '../stores/tournament'
-import { log } from '~/lib/Util'
+import { insertionSortObjs, log } from '~/lib/Util'
 
 export class ActionFns {
     static changeScore(self: TournamentStateExtended, round: number, player: string, scoreChange: number = 1) {
@@ -102,6 +102,18 @@ export class ActionFns {
             })
         }
         self.matches = matches
+    }
+
+    static getTimePassedSinceStartOfCurrentRound(self: TournamentStateExtended): number {
+        const state = self.$state
+        const match = state.matches.find((m) => m.round === state.roundNr)
+        if (!match || !match.dateStarted) {
+            log('no match or dateStarted found for round', state.roundNr, match)
+            return 0
+        }
+        const currentTime = new Date()
+        const matchDateStarted = new Date(match.dateStarted)
+        return currentTime.getTime() - matchDateStarted.getTime()
     }
 }
 
@@ -260,18 +272,4 @@ export function getTournamentScoresFromMatch(match: Match): any {
             [match.player2]: 2,
         }
     }
-}
-
-// insertionsort object array
-export function insertionSortObjs(arr: any[], key: string) {
-    for (let i = 1; i < arr.length; i++) {
-        let j = i - 1
-        let temp = arr[i]
-        while (j >= 0 && arr[j][key] > temp[key]) {
-            arr[j + 1] = arr[j]
-            j--
-        }
-        arr[j + 1] = temp
-    }
-    return arr
 }

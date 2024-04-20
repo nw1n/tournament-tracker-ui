@@ -1,10 +1,9 @@
 import { defineStore } from 'pinia'
-import { formatTime, log } from '~/lib/Util'
+import { formatTime, insertionSortObjs, log } from '~/lib/Util'
 import _ from 'lodash'
 import {
     getAllTournamentScores,
     getByeRatiosSorted,
-    insertionSortObjs,
     ActionFns as TournamentStoreActions,
 } from '~/lib/TournamentStoreFn'
 
@@ -108,15 +107,7 @@ export const useTournamentStore = defineStore('tournament', {
         // Getter Actions
         // ------------------------------------------------------------------
         getTimePassedSinceStartOfCurrentRound(): number {
-            const state = this
-            const match = state.matches.find((m) => m.round === state.roundNr)
-            if (!match || !match.dateStarted) {
-                log('no match or dateStarted found for round', state.roundNr, match)
-                return 0
-            }
-            const currentTime = new Date()
-            const matchDateStarted = new Date(match.dateStarted)
-            return currentTime.getTime() - matchDateStarted.getTime()
+            return TournamentStoreActions.getTimePassedSinceStartOfCurrentRound(this)
         },
     },
 
@@ -140,6 +131,10 @@ export const useTournamentStore = defineStore('tournament', {
 
         byeRatios(state) {
             return getByeRatiosSorted(state)
+        },
+
+        timeCurrentRoundStarted(state): string | undefined {
+            return this.timeRoundStarted(state.roundNr)
         },
 
         timeRoundStarted(state): (round: number) => string | undefined {
