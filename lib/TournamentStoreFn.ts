@@ -1,9 +1,10 @@
 import _ from 'lodash'
 import type { Match, TournamentState, TournamentStateExtended } from '../stores/main'
+import { log } from '~/lib/Util'
 
 export class ActionFns {
     static changeScore(self: TournamentStateExtended, round: number, player: string, scoreChange: number = 1) {
-        console.log(`increaseScore round ${round} player ${player}`)
+        log(`increaseScore round ${round} player ${player}`)
         const matches = _.cloneDeep(self.matches)
         const match = matches.find((m) => m.round === round && (m.player1 === player || m.player2 === player))
         if (match) {
@@ -78,9 +79,9 @@ export class ActionFns {
         }
 
         if (isGoodMatchupsFound) {
-            console.log('found unique matchups. used tries: ' + i)
+            log('found unique matchups. used tries: ' + i)
         } else {
-            console.log('no unique matchups found. use repeated matchups. used tries: ' + i)
+            log('no unique matchups found. use repeated matchups. used tries: ' + i)
         }
 
         // if there is a bye player, add it to the end of the array
@@ -176,7 +177,7 @@ export function getNumberOfMatchesPlayedByPlayer(state: any) {
 export function getByeRatios(state: any) {
     const totalByes = getTotalByes(state) as any
     const matchesPlayedByPlayer = getNumberOfMatchesPlayedByPlayer(state) as any
-    console.log(matchesPlayedByPlayer)
+    log(matchesPlayedByPlayer)
     const byeRatios = {} as any
     for (const player of state.players) {
         byeRatios[player] = 0
@@ -200,7 +201,7 @@ export function getPlayersUniqueFromMatches(matches: Match[]) {
             players.push(match.player2)
         }
     }
-    console.log('players', players)
+    log('players', players)
     return _.uniq(players)
 }
 

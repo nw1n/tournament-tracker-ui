@@ -4,9 +4,8 @@ import _ from 'lodash'
 import {
     getAllTournamentScores,
     getByeRatiosSorted,
-    getNumberOfMeetsBetweenPlayers,
     insertionSortObjs,
-    ActionFns,
+    ActionFns as TournamentStoreActions,
 } from '~/lib/TournamentStoreFn'
 
 export interface Match {
@@ -94,7 +93,7 @@ export const useTournamentStore = defineStore('tournament', {
         },
 
         createMatchesForRound() {
-            ActionFns.createMatchesForRound(this, this.roundNr)
+            TournamentStoreActions.createMatchesForRound(this, this.roundNr)
         },
 
         endRoundAndCreateNewMatches() {
@@ -103,15 +102,25 @@ export const useTournamentStore = defineStore('tournament', {
         },
 
         changeScore(round: number, player: string, scoreChange: number) {
-            ActionFns.changeScore(this, round, player, scoreChange)
+            TournamentStoreActions.changeScore(this, round, player, scoreChange)
         },
     },
 
     getters: {
-        isTournamentActive: (state) => state.roundNr > 0,
-        isTournamentInProgress: (state) => state.matches.length > 0,
-        isBuyMatch: (state) => (match: Match) => {
-            return match.player2 === 'BYE' || match.player1 === 'BYE'
+        isTournamentActive(state): boolean {
+            return state.roundNr > 0
+        },
+
+        isTournamentInProgress(state): boolean {
+            return state.matches.length > 0
+        },
+        // isBuyMatch: (state) => (match: Match) => {
+        //     return match.player2 === 'BYE' || match.player1 === 'BYE'
+        // },
+        isBuyMatch(state): (match: Match) => boolean {
+            return (match: Match) => {
+                return match.player2 === 'BYE' || match.player1 === 'BYE'
+            }
         },
         matchesByRound: (state) => (round: number) => state.matches.filter((m) => m.round === round),
         allTournamentScores: (state) => {
