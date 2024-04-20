@@ -13,6 +13,14 @@ export class MatchMaker {
         this.players = store.players
     }
 
+    public run() {
+        this.setNextByePlayer()
+        const playerScoreMapFilteredForActivePlayersWithoutByePlayer =
+            this.createPlayerScoreMapFilteredForActivePlayersAndBye()
+        this.playerPairs = this.createPlayerPairs(playerScoreMapFilteredForActivePlayersWithoutByePlayer)
+        this.persistPlayerPairsToMatches(this.playerPairs)
+    }
+
     public setNextByePlayer() {
         if (!this.isOddNumberOfPlayers) {
             return
@@ -123,10 +131,7 @@ export class MatchMaker {
 export class TournamentStoreActions {
     static createMatchesForRound(store: TournamentStateExtended) {
         const matchMaker = new MatchMaker(store)
-        matchMaker.setNextByePlayer()
-        const tournamentPlayerScoreMapFiltered = matchMaker.createPlayerScoreMapFilteredForActivePlayersAndBye()
-        const playerPairs = matchMaker.createPlayerPairs(tournamentPlayerScoreMapFiltered)
-        matchMaker.persistPlayerPairsToMatches(playerPairs)
+        matchMaker.run()
     }
 
     static changeScore(self: TournamentStateExtended, round: number, player: string, scoreChange: number = 1) {
