@@ -42,20 +42,12 @@ export const useTournamentStore = defineStore('tournament', {
         matches: [] as Match[],
     }),
     actions: {
-        createMatchesForRound(roundNr: number) {
-            ActionFns.createMatchesForRound(this, roundNr)
-        },
-        createMatchesForRoundWithNoRepeats(roundNr: number) {
-            this.createMatchesForRound(roundNr)
-        },
         init() {
             log('Initializing tournament')
+            this.reset()
             this.roundNr = 1
-            this.finishedRoundNr = 0
-            this.players = []
             this.startDate = new Date()
             this.id = this.startDate.getTime()
-            this.matches = []
         },
         reset() {
             this.roundNr = 0
@@ -87,12 +79,12 @@ export const useTournamentStore = defineStore('tournament', {
             this.endRound()
             this.nextRound()
         },
-        createNewMatches() {
-            this.createMatchesForRoundWithNoRepeats(this.roundNr)
+        createMatchesForRound() {
+            ActionFns.createMatchesForRound(this, this.roundNr)
         },
         endRoundAndCreateNewMatches() {
             this.endRoundAndNextRound()
-            this.createNewMatches()
+            this.createMatchesForRound()
         },
         increaseScore(round: number, player: string, scoreChange: number = 1) {
             log(`increaseScore round ${round} player ${player}`)

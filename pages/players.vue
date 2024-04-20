@@ -3,8 +3,6 @@ import { useTournamentStore } from '@/stores/main'
 import { getRandomName } from '@/lib/getRandomName'
 import { Config } from '@/lib/Config'
 
-//const isDevMode = ref(Config.getInstance().isDevMode)
-
 const tournament = useTournamentStore()
 
 const errorMessage = ref('')
@@ -47,7 +45,7 @@ const startTournament = async () => {
         errorMessage.value = 'At least 2 players are required'
         return
     }
-    tournament.createMatchesForRoundWithNoRepeats(tournament.roundNr)
+    tournament.createMatchesForRound()
     await navigateTo('/round')
 }
 

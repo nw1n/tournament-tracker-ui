@@ -27,9 +27,7 @@ const nav = [
         <div id="debug" class="flex gap-2 flex-wrap">
             <button @click="tournament.init()">Init Tournament</button>
             <button @click="tournament.endAndReset()">End Tournament</button>
-            <button @click="tournament.createMatchesForRoundWithNoRepeats(tournament.roundNr)">
-                Create First Round Matches
-            </button>
+            <button @click="tournament.createMatchesForRound()">Create First Round Matches</button>
             <button @click="tournament.endRoundAndCreateNewMatches()">End Round</button>
         </div>
     </div>
