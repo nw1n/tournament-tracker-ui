@@ -137,16 +137,6 @@ export const useTournamentStore = defineStore('tournament', {
             return this.timeRoundStarted(state.roundNr)
         },
 
-        timeRoundStarted(state): (round: number) => string | undefined {
-            return (round: number) => {
-                const match = state.matches.find((m) => m.round === round)
-                if (!match || !match.dateStarted) {
-                    return undefined
-                }
-                return formatTime(match.dateStarted)
-            }
-        },
-
         finishedMatches(state): Match[] {
             return state.matches.filter((m: Match) => m.round <= state.finishedRoundNr)
         },
@@ -161,6 +151,16 @@ export const useTournamentStore = defineStore('tournament', {
 
         matchesByRound(state): (round: number) => Match[] {
             return (round: number) => state.matches.filter((m) => m.round === round)
+        },
+
+        timeRoundStarted(state): (round: number) => string | undefined {
+            return (round: number) => {
+                const match = state.matches.find((m) => m.round === round)
+                if (!match || !match.dateStarted) {
+                    return undefined
+                }
+                return formatTime(match.dateStarted)
+            }
         },
     },
 })
