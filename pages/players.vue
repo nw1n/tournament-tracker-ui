@@ -8,17 +8,19 @@ const tournament = useTournamentStore()
 const errorMessage = ref('')
 const newPlayer = ref('')
 const inputLabel = ref(null)
+
 const addPlayer = () => {
-    if (!newPlayer.value || newPlayer.value.trim() === '') {
+    const newPlayerName = newPlayer.value.trim()
+    if (!newPlayer.value || newPlayerName === '') {
         errorMessage.value = 'Player name is required'
         return
     }
-    if (tournament.isPlayerExists(newPlayer.value)) {
+    if (tournament.players.includes(newPlayerName)) {
         errorMessage.value = 'Player already exists'
         return
     }
     errorMessage.value = ''
-    tournament.addPlayer(newPlayer.value.trim())
+    tournament.addPlayer(newPlayerName)
     newPlayer.value = ''
     inputLabel.value.focus()
 }
@@ -26,7 +28,7 @@ const addPlayer = () => {
 const addRandomPlayers = (x) => {
     for (let i = 0; i < x; i++) {
         const playerName = getRandomName(tournament.players.slice())
-        if (playerName && !tournament.isPlayerExists(playerName)) {
+        if (playerName && !tournament.players.includes(playerName)) {
             tournament.addPlayer(playerName)
         }
     }

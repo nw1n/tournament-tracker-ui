@@ -105,7 +105,7 @@ export const useTournamentStore = defineStore('tournament', {
             TournamentStoreActions.changeScore(this, round, player, scoreChange)
         },
 
-        // Action getters
+        // Getter Actions
         // ------------------------------------------------------------------
         getTimePassedSinceStartOfCurrentRound(): number {
             const state = this
@@ -128,28 +128,30 @@ export const useTournamentStore = defineStore('tournament', {
         isTournamentInProgress(state): boolean {
             return state.matches.length > 0
         },
-        // isBuyMatch: (state) => (match: Match) => {
-        //     return match.player2 === 'BYE' || match.player1 === 'BYE'
-        // },
-        allTournamentScores: (state) => {
-            console.log('allTournamentScores')
+
+        allTournamentScores(state): any[] {
             return getAllTournamentScores(state)
         },
-        allTournamentScoresSorted: (state) => {
-            const scores = getAllTournamentScores(state)
+
+        allTournamentScoresSorted(state): any[] {
+            const scores = this.allTournamentScores.slice()
             return insertionSortObjs(scores, 'score').reverse()
         },
-        isPlayerExists: (state) => (player: string) => state.players.includes(player),
-        byeRatios: (state) => {
+
+        byeRatios(state) {
             return getByeRatiosSorted(state)
         },
-        timeRoundStarted: (state) => (round: number) => {
-            const match = state.matches.find((m) => m.round === round)
-            if (!match || !match.dateStarted) {
-                return undefined
+
+        timeRoundStarted(state): (round: number) => string | undefined {
+            return (round: number) => {
+                const match = state.matches.find((m) => m.round === round)
+                if (!match || !match.dateStarted) {
+                    return undefined
+                }
+                return formatTime(match.dateStarted)
             }
-            return formatTime(match.dateStarted)
         },
+
         finishedMatches(state): Match[] {
             return state.matches.filter((m: Match) => m.round <= state.finishedRoundNr)
         },
