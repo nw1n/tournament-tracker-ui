@@ -33,6 +33,10 @@ export interface TournamentStateExtended extends TournamentState {
 }
 
 export const useTournamentStore = defineStore('tournament', {
+    persist: {
+        storage: persistedState.localStorage,
+    },
+
     state: (): TournamentState => ({
         roundNr: 0,
         finishedRoundNr: 0,
@@ -41,6 +45,7 @@ export const useTournamentStore = defineStore('tournament', {
         id: 0,
         matches: [],
     }),
+
     actions: {
         reset() {
             this.roundNr = 0
@@ -50,6 +55,7 @@ export const useTournamentStore = defineStore('tournament', {
             this.id = 0
             this.matches = []
         },
+
         init() {
             log('Initializing tournament')
             this.reset()
@@ -57,49 +63,50 @@ export const useTournamentStore = defineStore('tournament', {
             this.startDate = new Date()
             this.id = this.startDate.getTime()
         },
+
         endAndReset() {
             this.reset()
         },
+
         addPlayer(player: string) {
             this.players.push(player)
         },
+
         removePlayer(player: string) {
             this.players = this.players.filter((p) => p !== player)
         },
+
         resetPlayers() {
             this.players = []
         },
+
         endRound() {
             this.finishedRoundNr = this.roundNr
         },
+
         nextRound() {
             this.roundNr++
         },
+
         endRoundAndNextRound() {
             this.endRound()
             this.nextRound()
         },
+
         createMatchesForRound() {
             ActionFns.createMatchesForRound(this, this.roundNr)
         },
+
         endRoundAndCreateNewMatches() {
             this.endRoundAndNextRound()
             this.createMatchesForRound()
         },
-        increaseScore(round: number, player: string, scoreChange: number = 1) {
-            log(`increaseScore round ${round} player ${player}`)
-            const matches = _.cloneDeep(this.matches)
-            const match = matches.find((m) => m.round === round && (m.player1 === player || m.player2 === player))
-            if (match) {
-                if (match.player1 === player) {
-                    match.score1 += scoreChange
-                } else {
-                    match.score2 += scoreChange
-                }
-            }
-            this.matches = matches
+
+        changeScore(round: number, player: string, scoreChange: number) {
+            ActionFns.changeScore(this, round, player, scoreChange)
         },
     },
+
     getters: {
         isTournamentActive: (state) => state.roundNr > 0,
         isTournamentInProgress: (state) => state.matches.length > 0,
@@ -141,8 +148,5 @@ export const useTournamentStore = defineStore('tournament', {
             const matches = state.matches.filter((m: Match) => m.round <= state.finishedRoundNr)
             return matches
         },
-    },
-    persist: {
-        storage: persistedState.localStorage,
     },
 })

@@ -164,8 +164,8 @@ const changePlayers = () => {
                         <div class="player-score">{{ match.score1 }}</div>
 
                         <div v-if="!tournament.isBuyMatch(match) && match.round === tournament.roundNr">
-                            <button @click="tournament.increaseScore(tournament.roundNr, match.player1)">+</button>
-                            <button @click="tournament.increaseScore(tournament.roundNr, match.player1, -1)">-</button>
+                            <button @click="tournament.changeScore(tournament.roundNr, match.player1, 1)">+</button>
+                            <button @click="tournament.changeScore(tournament.roundNr, match.player1, -1)">-</button>
                         </div>
                     </div>
                     <div class="w-16">-----</div>
@@ -174,8 +174,8 @@ const changePlayers = () => {
                         <div class="player-score">{{ match.score2 }}</div>
 
                         <div v-if="!tournament.isBuyMatch(match) && match.round === tournament.roundNr">
-                            <button @click="tournament.increaseScore(tournament.roundNr, match.player2)">+</button>
-                            <button @click="tournament.increaseScore(tournament.roundNr, match.player2, -1)">-</button>
+                            <button @click="tournament.changeScore(tournament.roundNr, match.player2, 1)">+</button>
+                            <button @click="tournament.changeScore(tournament.roundNr, match.player2, -1)">-</button>
                         </div>
                     </div>
                 </div>

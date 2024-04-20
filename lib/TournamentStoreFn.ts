@@ -2,6 +2,20 @@ import _ from 'lodash'
 import type { Match, TournamentState, TournamentStateExtended } from '../stores/main'
 
 export class ActionFns {
+    static changeScore(self: TournamentStateExtended, round: number, player: string, scoreChange: number = 1) {
+        console.log(`increaseScore round ${round} player ${player}`)
+        const matches = _.cloneDeep(self.matches)
+        const match = matches.find((m) => m.round === round && (m.player1 === player || m.player2 === player))
+        if (match) {
+            if (match.player1 === player) {
+                match.score1 += scoreChange
+            } else {
+                match.score2 += scoreChange
+            }
+        }
+        self.matches = matches
+    }
+
     static createMatchesForRound(self: TournamentStateExtended, roundNr: number) {
         let nextByePlayer = ''
         const players = self.players
