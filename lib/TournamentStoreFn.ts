@@ -24,17 +24,11 @@ export function changeScore(self: TournamentStateExtended, round: number, player
 }
 
 export function getPlayersUniqueFromMatches(matches: Match[]) {
-    const players = [] as string[]
-    for (const match of matches) {
-        if (match.player1 !== 'BYE') {
-            players.push(match.player1)
-        }
-        if (match.player2 !== 'BYE') {
-            players.push(match.player2)
-        }
-    }
-    log('players', players)
-    return _.uniq(players)
+    const players: string[] = matches.map((m) => [m.player1, m.player2]).flat()
+    const uniquePlayers = Array.from(new Set(players))
+    const filteredPlayers = uniquePlayers.filter((p) => p !== 'BYE')
+    log('players', filteredPlayers)
+    return filteredPlayers
 }
 
 export function getAllTournamentScores(state: any) {
