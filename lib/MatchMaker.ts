@@ -5,7 +5,7 @@ import { log, insertionSortObjs } from '~/lib/Util'
 export class MatchMaker {
     public store: TournamentStateExtended
     public byePlayer = ''
-    public previousMeets: any = {}
+    public previousMeets: Map<string, number> = new Map()
     public playerPairs: string[][] = []
 
     constructor(store: TournamentStateExtended) {
@@ -38,7 +38,7 @@ export class MatchMaker {
         this.playerPairs = playerPairsSorted
     }
 
-    static tryFindingGoodPairings(playersList: string[], meets: any) {
+    static tryFindingGoodPairings(playersList: string[], meets: Map<string, number>) {
         let playerPairsSorted: string[][] = []
         const maxTries = 100000
 
@@ -94,10 +94,10 @@ export class MatchMaker {
 // ------------------------------------------------------------------------------------------------
 // helper functions
 
-function isPlayerPairsFreeOfPairsThatPlayedBefore(playerPairs: string[][], previousMeets: any) {
+function isPlayerPairsFreeOfPairsThatPlayedBefore(playerPairs: string[][], previousMeets: Map<string, number>) {
     for (const pair of playerPairs) {
         const key = pair.join('-')
-        if (previousMeets[key] > 0) {
+        if (previousMeets.get(key) && previousMeets.get(key)! > 0) {
             return false
         }
     }
@@ -174,12 +174,16 @@ export function getByeRatiosSorted(state: any) {
     return result
 }
 
-export function getNumberOfMeetsBetweenPlayers(state: any) {
-    const meets = {} as any
-    const matchesFilteredForByes = state.matches.filter((m: Match) => [m.player1, m.player2].includes('BYE') === false)
+export function getNumberOfMeetsBetweenPlayers(state: any): Map<string, number> {
+    const meets = new Map<string, number>()
+
+    const matchesFilteredForByes = state.matches.filter((m: Match) => ![m.player1, m.player2].includes('BYE'))
+
     for (const match of matchesFilteredForByes) {
-        const key = [match.player1, match.player2].sort().join('-')
-        meets[key] = meets[key] ? meets[key] + 1 : 1
+        const players = [match.player1, match.player2].sort()
+        const key = `${players[0]}-${players[1]}`
+        meets.set(key, meets.get(key) ? meets.get(key)! + 1 : 1)
     }
+
     return meets
 }
