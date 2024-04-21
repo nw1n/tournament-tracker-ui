@@ -6,50 +6,68 @@ export class MatchMaker {
     public store: TournamentStateExtended
     public byePlayer = ''
     public previousMeets: any = {}
+    public playerPairs: string[][] = []
 
     constructor(store: TournamentStateExtended) {
         this.store = store
         this.previousMeets = getNumberOfMeetsBetweenPlayers(this.store.$state)
     }
 
-    public run() {
+    run() {
         this.setByePlayer()
-        const playerPairs = this.createPlayerPairs()
-        this.persistPlayerPairsToMatches(playerPairs)
+        this.createPlayerPairs()
+        this.persistPlayerPairsToMatches()
     }
 
-    public setByePlayer() {
+    setByePlayer() {
         if (this.isEvenNumberOfPlayers) {
             return
         }
         this.byePlayer = this.getPlayerWithHighestByeRatio()
     }
 
-    public createPlayersListFilteredForBye() {
-        return this.store.players.filter((player) => {
-            if (this.byePlayer) {
-                return player !== this.byePlayer
-            }
-            return true
-        })
-    }
-
-    public createPlayerPairs(): string[][] {
-        const playersListFilteredForBye = this.createPlayersListFilteredForBye()
-
-        const playerPairsSorted = tryFindingGoodPairings(playersListFilteredForBye, this.previousMeets)
+    createPlayerPairs() {
+        const playersListFilteredForBye = this.store.players.filter((player) => player !== this.byePlayer)
+        const playerPairsSorted = MatchMaker.tryFindingGoodPairings(playersListFilteredForBye, this.previousMeets)
 
         // if there is a bye player, add it to the end of the array
         if (this.byePlayer) {
             playerPairsSorted.push([this.byePlayer, 'BYE'])
         }
 
+        this.playerPairs = playerPairsSorted
+    }
+
+    static tryFindingGoodPairings(playersList: string[], meets: any) {
+        let playerPairsSorted: string[][] = []
+        const maxTries = 100000
+
+        for (let i = 0; i < maxTries; i++) {
+            // shuffle players
+            const playersCloneShuffled = _.shuffle(playersList)
+
+            // TODO: sort by score
+            // const playersCloneShuffledSortedByScore = ...
+
+            // create pairs
+            playerPairsSorted = createPlayerPairsFromList(playersCloneShuffled)
+
+            // check if players have met too many times
+            if (isPlayerPairsFreeOfPairsThatPlayedBefore(playerPairsSorted, meets)) {
+                log('found unique matchups. used tries: ' + i)
+                return playerPairsSorted
+            }
+        }
+
+        log('no unique matchups found. use repeated matchups. used tries: ' + maxTries)
+
+        // tmp solution: if no unique matchups are found, return the last created pairs
         return playerPairsSorted
     }
 
-    public persistPlayerPairsToMatches(playerPairs: string[][]) {
+    persistPlayerPairsToMatches() {
         const matches = [...this.store.matches] as Match[]
-        for (const pair of playerPairs) {
+        for (const pair of this.playerPairs) {
             matches.push({
                 round: this.store.roundNr,
                 player1: pair[0],
@@ -63,11 +81,11 @@ export class MatchMaker {
         this.store.matches = matches
     }
 
-    public get isEvenNumberOfPlayers() {
+    get isEvenNumberOfPlayers() {
         return this.store.players.length % 2 === 0
     }
 
-    public getPlayerWithHighestByeRatio(): string {
+    getPlayerWithHighestByeRatio(): string {
         const byeRatiosSorted = getByeRatiosSorted(this.store.$state)
         return byeRatiosSorted[0].player
     }
@@ -75,35 +93,6 @@ export class MatchMaker {
 
 // ------------------------------------------------------------------------------------------------
 // helper functions
-function tryFindingGoodPairings(playersList: string[], meets: any) {
-    let playerPairsSorted: string[][] = []
-    let isGoodMatchupsFound = false
-    const maxTries = 100000
-
-    for (let i = 0; i < maxTries; i++) {
-        // shuffle players
-        const playersCloneShuffled = _.shuffle(playersList)
-
-        // TODO: sort by score
-        // const playersCloneShuffledSortedByScore = ...
-
-        // create pairs
-        playerPairsSorted = createPlayerPairsFromList(playersCloneShuffled)
-
-        // check if players have met too many times
-        if (isPlayerPairsFreeOfPairsThatPlayedBefore(playerPairsSorted, meets)) {
-            log('found unique matchups. used tries: ' + i)
-            isGoodMatchupsFound = true
-            break
-        }
-    }
-
-    if (!isGoodMatchupsFound) {
-        log('no unique matchups found. use repeated matchups. used tries: ' + maxTries)
-    }
-
-    return playerPairsSorted
-}
 
 function isPlayerPairsFreeOfPairsThatPlayedBefore(playerPairs: string[][], previousMeets: any) {
     for (const pair of playerPairs) {
@@ -116,15 +105,8 @@ function isPlayerPairsFreeOfPairsThatPlayedBefore(playerPairs: string[][], previ
 }
 
 function createPlayerPairsFromList(playersList: string[]): string[][] {
-    // create pairs
-    const playerPairsUnSorted = _.chunk(playersList, 2)
-
-    // sort the two players in each pair by name
-    const playerPairsSorted = playerPairsUnSorted.map((pair) => {
-        pair.sort()
-        return pair
-    })
-    return playerPairsSorted
+    // create pairs and sort the two players in each pair by name
+    return _.chunk(playersList, 2).map((pair) => pair.sort())
 }
 
 function getByeRatios(state: any) {
