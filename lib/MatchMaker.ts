@@ -1,29 +1,28 @@
 import _ from 'lodash'
-import type { Match, TournamentState, TournamentStateExtended } from '../stores/tournament'
-import { log, insertionSortObjs } from '~/lib/Util'
+import type { Match, TournamentStateExtended } from '../stores/tournament'
+import { log } from '~/lib/Util'
+import { getByeRatiosSorted } from './ByeRatios'
 
 export class MatchMaker {
     public store: TournamentStateExtended
     public byePlayer = ''
     public previousMeets: Map<string, number> = new Map()
+    public byeRatiosSorted: any[] = []
     public playerPairs: string[][] = []
 
     constructor(store: TournamentStateExtended) {
         this.store = store
         this.previousMeets = getNumberOfMeetsBetweenPlayers(this.store.$state)
-    }
-
-    run() {
+        this.byeRatiosSorted = getByeRatiosSorted(this.store.$state)
         this.setByePlayer()
         this.createPlayerPairs()
-        this.persistPlayerPairsToMatches()
     }
 
     setByePlayer() {
         if (this.isEvenNumberOfPlayers) {
             return
         }
-        this.byePlayer = this.getPlayerWithHighestByeRatio()
+        this.byePlayer = this.playerWithHighestByeRatio
     }
 
     createPlayerPairs() {
@@ -65,29 +64,12 @@ export class MatchMaker {
         return playerPairsSorted
     }
 
-    persistPlayerPairsToMatches() {
-        const matches = [...this.store.matches] as Match[]
-        for (const pair of this.playerPairs) {
-            matches.push({
-                round: this.store.roundNr,
-                player1: pair[0],
-                player2: pair[1],
-                score1: pair[1] === 'BYE' ? 9 : 0,
-                score2: 0,
-                dateStarted: new Date().getTime(),
-                tournamentId: this.store.id,
-            })
-        }
-        this.store.matches = matches
-    }
-
     get isEvenNumberOfPlayers() {
         return this.store.players.length % 2 === 0
     }
 
-    getPlayerWithHighestByeRatio(): string {
-        const byeRatiosSorted = getByeRatiosSorted(this.store.$state)
-        return byeRatiosSorted[0].player
+    get playerWithHighestByeRatio(): string {
+        return this.byeRatiosSorted?.length ? this.byeRatiosSorted[0].player : ''
     }
 }
 
@@ -103,77 +85,6 @@ function isPlayerPairsFreeOfPairsThatPlayedBefore(playerPairs: string[][], previ
     }
     return true
 }
-
-function getByeRatios(state: any) {
-    const totalByes = getTotalByes(state) as any
-    const matchesPlayedByPlayer = getNumberOfMatchesPlayedByPlayer(state) as any
-    log(matchesPlayedByPlayer)
-    const byeRatios = {} as any
-    for (const player of state.players) {
-        byeRatios[player] = 0
-        const byes = totalByes[player]
-        const matchesPlayed = matchesPlayedByPlayer[player]
-        if (!matchesPlayed || !byes) {
-            continue
-        }
-        byeRatios[player] = totalByes[player] / matchesPlayedByPlayer[player]
-    }
-    return byeRatios
-}
-
-function getTotalByes(state: any) {
-    const byeRatios = {} as any
-    for (const player of state.players) {
-        byeRatios[player] = 0
-    }
-    for (const match of state.matches) {
-        // maybe bye player is always player2 and therefore can be made simpler
-        if (match.player2 === 'BYE') {
-            byeRatios[match.player1]++
-        }
-        if (match.player1 === 'BYE') {
-            byeRatios[match.player2]++
-        }
-    }
-    return byeRatios
-}
-
-function getNumberOfMatchesPlayedByPlayer(state: any) {
-    const matchesPlayed = {} as any
-    const matches = state.matches.filter((m: Match) => m.round <= state.finishedRoundNr)
-    for (const match of matches) {
-        if (match.player1 !== 'BYE') {
-            const playerName = match.player1
-            if (!matchesPlayed[playerName]) {
-                matchesPlayed[playerName] = 0
-            }
-            matchesPlayed[playerName]++
-        }
-        if (match.player2 !== 'BYE') {
-            const playerName = match.player2
-            if (!matchesPlayed[playerName]) {
-                matchesPlayed[playerName] = 0
-            }
-            matchesPlayed[playerName]++
-        }
-    }
-    return matchesPlayed
-}
-
-function getByeRatiosSorted(state: any) {
-    const src = getByeRatios(state)
-    let result = [] as any[]
-    for (const player of Object.keys(src)) {
-        result.push({
-            player,
-            ratio: src[player],
-        })
-    }
-    result = _.shuffle(result)
-    result = insertionSortObjs(result, 'ratio')
-    return result
-}
-
 
 function getNumberOfMeetsBetweenPlayers(state: any): Map<string, number> {
     const meets = new Map<string, number>()

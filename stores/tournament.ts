@@ -59,6 +59,22 @@ export const useTournamentStore = defineStore('tournament', {
             this.id = this.startDate.getTime()
         },
 
+        createMatchesForRound() {
+            const matchMaker = new MatchMaker(this)
+
+            const newMatches = matchMaker.playerPairs.map((pair) => ({
+                round: this.roundNr,
+                player1: pair[0],
+                player2: pair[1],
+                score1: pair[1] === 'BYE' ? 9 : 0,
+                score2: 0,
+                dateStarted: Date.now(),
+                tournamentId: this.id,
+            }))
+
+            this.matches = this.matches.concat(newMatches)
+        },
+
         endAndReset() {
             this.reset()
         },
@@ -81,11 +97,6 @@ export const useTournamentStore = defineStore('tournament', {
 
         incrementRoundNr() {
             this.roundNr++
-        },
-
-        createMatchesForRound() {
-            const matchMaker = new MatchMaker(this)
-            matchMaker.run()
         },
 
         endRoundAndCreateNewMatches() {
