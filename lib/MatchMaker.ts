@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import type { Match, TournamentStateExtended } from '../stores/tournament'
+import type { Match, TournamentState, TournamentStateExtended } from '../stores/tournament'
 import { log, insertionSortObjs } from '~/lib/Util'
 import { getAllTournamentScores } from './TournamentStoreFn'
 
@@ -29,20 +29,20 @@ export class MatchMaker {
 
     public createPlayerScoreMapFilteredForActivePlayersAndBye() {
         // clone players array. MAJOR ISSUE: bad practice using getAllTournamentScores here
-        let tournamentPlayerScoreMap = _.cloneDeep(getAllTournamentScores(this.store.$state) as any[])
+        let tournamentPlayerScoreMap = _.cloneDeep(this.store.players)
 
         console.log('tournamentPlayerScoreMap', tournamentPlayerScoreMap)
 
         // filter players that are not in players array
-        const playerScoreMapFilteredForActivePlayers = tournamentPlayerScoreMap.filter((p) =>
-            this.store.players.includes(p.player),
+        const playerScoreMapFilteredForActivePlayers = tournamentPlayerScoreMap.filter((player) =>
+            this.store.players.includes(player),
         )
 
         // remove bye player
         const playerScoreMapFilteredForActivePlayersWithoutByePlayer = playerScoreMapFilteredForActivePlayers.filter(
-            (p) => {
+            (player) => {
                 if (this.byePlayer) {
-                    return p.player !== this.byePlayer
+                    return player !== this.byePlayer
                 }
                 return true
             },
@@ -62,41 +62,21 @@ export class MatchMaker {
             // shuffle players
             const playersCloneShuffled = _.shuffle(tournamentPlayerScoreMapFilteredForActivePlayersWithoutByePlayer)
 
-            // sort by score
-            // playersClone = insertionSortObjs(playersClone, 'score').reverse()
+            // TODO: sort by score
+            // const playersCloneShuffledSortedByScore = ...
 
-            // create simple player array
-            const playersNameList = playersCloneShuffled.map((p) => p.player)
-
-            // create pairs
-            const playerPairsUnSorted = _.chunk(playersNameList, 2)
-
-            // sort the two players in each pair by name
-            playerPairsSorted = playerPairsUnSorted.map((pair) => {
-                pair.sort()
-                return pair
-            })
+            playerPairsSorted = createPlayerPairsFromList(playersCloneShuffled)
 
             // check if players have met too many times
-            let hasTooManyMeets = false
-            for (const pair of playerPairsSorted) {
-                const key = pair.join('-')
-                if (meets[key] > 0) {
-                    hasTooManyMeets = true
-                    // break inner for loop
-                    break
-                }
-            }
-            if (!hasTooManyMeets) {
+            if (isPlayerPairsFreeOfPairsThatPlayedBefore(playerPairsSorted, meets)) {
+                log('found unique matchups. used tries: ' + i)
                 isGoodMatchupsFound = true
                 // break outer for loop
                 break
             }
         }
 
-        if (isGoodMatchupsFound) {
-            log('found unique matchups. used tries: ' + i)
-        } else {
+        if (!isGoodMatchupsFound) {
             log('no unique matchups found. use repeated matchups. used tries: ' + i)
         }
 
@@ -136,6 +116,27 @@ export class MatchMaker {
 
 // ------------------------------------------------------------------------------------------------
 // helper functions
+function isPlayerPairsFreeOfPairsThatPlayedBefore(playerPairs: string[][], previousMeets: any) {
+    for (const pair of playerPairs) {
+        const key = pair.join('-')
+        if (previousMeets[key] > 0) {
+            return false
+        }
+    }
+    return true
+}
+
+function createPlayerPairsFromList(playersList: string[]): string[][] {
+    // create pairs
+    const playerPairsUnSorted = _.chunk(playersList, 2)
+
+    // sort the two players in each pair by name
+    const playerPairsSorted = playerPairsUnSorted.map((pair) => {
+        pair.sort()
+        return pair
+    })
+    return playerPairsSorted
+}
 
 function getByeRatios(state: any) {
     const totalByes = getTotalByes(state) as any
