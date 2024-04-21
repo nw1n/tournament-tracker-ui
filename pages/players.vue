@@ -68,9 +68,9 @@ const continueTournament = () => {
             <div id="list-of-predefined-player">
                 <h1 class="mb-8">Predefined Players</h1>
                 <div v-for="(player, index) in settings.predefinedPlayers" :key="player">
-                    <div :class="`${tournament.players.includes(player) ? 'bg-blue-600' : ''}`">
-                        <p
-                            class="player-name flex justify-between"
+                    <div>
+                        <button
+                            :class="`${tournament.players.includes(player) ? 'bg-blue-400' : ''} player-name flex justify-between block w-full`"
                             @click="
                                 tournament.players.includes(player)
                                     ? tournament.removePlayer(player)
@@ -78,7 +78,7 @@ const continueTournament = () => {
                             "
                         >
                             {{ player }}
-                        </p>
+                        </button>
                     </div>
                 </div>
             </div>
