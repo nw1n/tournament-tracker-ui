@@ -1,3 +1,5 @@
+import type { SettingsState } from '~/stores/settings'
+
 export class ServerApi {
     static instance: ServerApi
 
@@ -13,16 +15,44 @@ export class ServerApi {
         return await response.json()
     }
 
-    get serverUrl(): string {
-        // read serverUrl directly from localStorage instead of using pinia
+    async postTournamentData(finishedMatches: any[]) {
+        const url = new URL('save-tournament/', this.serverUrl)
+        console.log('post tournament data to url', url)
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                tournament: JSON.stringify(finishedMatches),
+                password: this.serverPassword,
+            }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                console.log('Success:', data)
+            })
+            .catch((error) => {
+                console.error('Error:', error)
+            })
+    }
+
+    get settings(): SettingsState {
+        // read settings directly from localStorage instead of using pinia
         const localStorageSettingsStr = localStorage.getItem('settings') as any
 
         if (!localStorageSettingsStr) {
-            return 'http://localhost:5000'
+            return {} as SettingsState
         }
 
-        const localStorageSettings = JSON.parse(localStorageSettingsStr)
+        return JSON.parse(localStorageSettingsStr) as SettingsState
+    }
 
-        return localStorageSettings.serverUrl || 'http://localhost:5000'
+    get serverUrl(): string {
+        return this.settings.serverUrl || 'http://localhost:5000'
+    }
+
+    get serverPassword(): string {
+        return this.settings.password || ''
     }
 }

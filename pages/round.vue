@@ -4,6 +4,7 @@ import { useUiStore } from '@/stores/ui'
 import { useSettingsStore } from '@/stores/settings'
 import { millisecondsToTime } from '../lib/Util'
 import { onMounted, onUnmounted } from 'vue'
+import { ServerApi } from '~/lib/ServerApi.js'
 
 const tournament = useTournamentStore()
 const uiStore = useUiStore()
@@ -99,26 +100,8 @@ const trySavingDataToServer = () => {
 
 const saveDataToServer = () => {
     console.log('saving data to server')
-    const hostUrl = settings.serverUrl
-    const url = new URL('save-tournament/', hostUrl)
-    console.log('url', url)
-    fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            tournament: JSON.stringify(tournament.finishedMatches),
-            password: settings.password,
-        }),
-    })
-        .then((response) => response.json())
-        .then((data) => {
-            console.log('Success:', data)
-        })
-        .catch((error) => {
-            console.error('Error:', error)
-        })
+    const result = await ServerApi.getInstance().postTournamentData(tournament.finishedMatches)
+    console.log('result', result)
 }
 
 const endTournament = () => {
