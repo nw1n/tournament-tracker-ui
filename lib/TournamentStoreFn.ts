@@ -69,18 +69,20 @@ export function getAllTournamentScores(state: any) {
 }
 
 export function getTournamentScoresFromMatch(match: Match): any {
-    let result = [1, 1]
+    let player1Score = 1
+    let player2Score = 1
 
     if (match.score1 > match.score2) {
-        result = [2, 0]
+        player1Score = 2
+        player2Score = 0
     }
-    // case player2 wins
     if (match.score1 < match.score2) {
-        result = [0, 2]
+        player1Score = 0
+        player2Score = 2
     }
 
     return {
-        [match.player1]: result[0],
-        [match.player2]: result[1],
+        [match.player1]: player1Score,
+        [match.player2]: player2Score,
     }
 }
