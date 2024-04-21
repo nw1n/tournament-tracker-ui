@@ -21,38 +21,24 @@ export function changeScore(self: TournamentStateExtended, round: number, player
     self.matches = self.matches.slice()
 }
 
-export function getPlayersUniqueFromMatches(matches: Match[]) {
-    const playersSet = new Set<string>()
-
-    for (const match of matches) {
-        playersSet.add(match.player1)
-        playersSet.add(match.player2)
-    }
-
-    playersSet.delete('BYE')
-    return Array.from(playersSet)
-}
-
 export function getAllTournamentScores(state: any) {
-    const result = [] as any[]
-    const players = state.players.slice()
+    const players = new Set<string>(state.players)
 
     // tmp: add players that are not in players array
-    const otherPlayers = getPlayersUniqueFromMatches(state.matches.slice())
-    for (const player of otherPlayers) {
-        if (!players.includes(player)) {
-            players.push(player)
-        }
+    for (const match of state.matches) {
+        players.add(match.player1)
+        players.add(match.player2)
     }
 
+    // remove BYE
+    players.delete('BYE')
+
     // create result object
-    for (const player of players) {
-        const obj = {
-            player,
-            score: 0,
-        }
-        result.push(obj)
-    }
+    const result = Array.from(players).map((player) => ({
+        player,
+        score: 0,
+    }))
+
     const matches = state.matches.filter((m: Match) => m.round <= state.finishedRoundNr)
     for (const match of matches) {
         const scoreObj = getTournamentScoresFromMatch(match) as any
