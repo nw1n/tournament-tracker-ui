@@ -1,6 +1,6 @@
 <script setup>
 import { useTournamentStore } from '~/stores/tournament'
-import { getRandomName } from '@/lib/getRandomName'
+import { getRandomName } from '~/lib/getRandomNameForTesting'
 import { Config } from '@/lib/Config'
 
 const tournament = useTournamentStore()
