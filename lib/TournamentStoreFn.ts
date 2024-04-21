@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import type { Match, TournamentStateExtended } from '../stores/tournament'
-import { log } from '~/lib/Util'
+import { insertionSortObjs, log } from '~/lib/Util'
 
 export function changeScore(self: TournamentStateExtended, round: number, player: string, scoreChange: number) {
     const match = self.matches.find((m) => m.round === round && [m.player1, m.player2].includes(player))
@@ -53,5 +53,9 @@ export function getAllTournamentScores(state: any) {
         }
     }
 
-    return scores
+    // convert to array of objects
+    const scoresArray = Array.from(scores).map(([player, score]) => ({ player, score }))
+
+    // sort by score
+    return insertionSortObjs(scoresArray, 'score', 'desc')
 }

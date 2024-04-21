@@ -120,8 +120,7 @@ export const useTournamentStore = defineStore('tournament', {
         },
 
         allTournamentScoresSorted(state): any[] {
-            const scores = getAllTournamentScores(state).slice()
-            return insertionSortObjs(scores, 'score', 'desc')
+            return getAllTournamentScores(state)
         },
 
         timeCurrentRoundStarted(state): string | undefined {
