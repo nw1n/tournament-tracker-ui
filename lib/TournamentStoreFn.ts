@@ -22,51 +22,36 @@ export function changeScore(self: TournamentStateExtended, round: number, player
 }
 
 export function getAllTournamentScores(state: any) {
-    const players = new Set<string>(state.players)
+    const scores = new Map<string, number>()
 
-    // tmp: add players that are not in players array
+    // add active players
+    for (const player of state.players) {
+        scores.set(player, 0)
+    }
+
+    // add all players (even if they have dropped out)
     for (const match of state.matches) {
-        players.add(match.player1)
-        players.add(match.player2)
+        scores.set(match.player1, 0)
+        scores.set(match.player2, 0)
     }
 
     // remove BYE
-    players.delete('BYE')
+    scores.delete('BYE')
 
-    // create result object
-    const result = Array.from(players).map((player) => ({
-        player,
-        score: 0,
-    }))
+    // filter for finished matches
+    const finishedMatches = state.matches.filter((m: Match) => m.round <= state.finishedRoundNr)
 
-    const matches = state.matches.filter((m: Match) => m.round <= state.finishedRoundNr)
-    for (const match of matches) {
-        const scoreObj = getTournamentScoresFromMatch(match) as any
-        for (const player of Object.keys(scoreObj)) {
-            const resultObj = result.find((r) => r.player === player)
-            if (resultObj) {
-                resultObj.score += scoreObj[player]
-            }
+    // add scores from finished matches
+    for (const match of finishedMatches) {
+        if (match.score1 > match.score2) {
+            scores.set(match.player1, scores.get(match.player1)! + 2)
+        } else if (match.score2 > match.score1) {
+            scores.set(match.player2, scores.get(match.player2)! + 2)
+        } else {
+            scores.set(match.player1, scores.get(match.player1)! + 1)
+            scores.set(match.player2, scores.get(match.player2)! + 1)
         }
     }
-    return result
-}
 
-export function getTournamentScoresFromMatch(match: Match): any {
-    let player1Score = 1
-    let player2Score = 1
-
-    if (match.score1 > match.score2) {
-        player1Score = 2
-        player2Score = 0
-    }
-    if (match.score1 < match.score2) {
-        player1Score = 0
-        player2Score = 2
-    }
-
-    return {
-        [match.player1]: player1Score,
-        [match.player2]: player2Score,
-    }
+    return scores
 }
