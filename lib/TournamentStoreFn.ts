@@ -3,26 +3,24 @@ import type { Match, TournamentState, TournamentStateExtended } from '../stores/
 import { insertionSortObjs, log } from '~/lib/Util'
 import { MatchMaker } from './MatchMaker'
 
-export class TournamentStoreActions {
-    static changeScore(self: TournamentStateExtended, round: number, player: string, scoreChange: number = 1) {
-        log(`increaseScore round ${round} player ${player}`)
-        const matches = _.cloneDeep(self.matches)
-        // find match by round and player
-        const match = matches.find((m) => m.round === round && [m.player1, m.player2].includes(player))
+export function changeScore(self: TournamentStateExtended, round: number, player: string, scoreChange: number = 1) {
+    log(`increaseScore round ${round} player ${player}`)
+    const matches = _.cloneDeep(self.matches)
+    // find match by round and player
+    const match = matches.find((m) => m.round === round && [m.player1, m.player2].includes(player))
 
-        if (!match) {
-            log('failed increasing score, match not found')
-            return
-        }
-
-        // increase score
-        if (match.player1 === player) {
-            match.score1 += scoreChange
-        } else {
-            match.score2 += scoreChange
-        }
-        self.matches = matches
+    if (!match) {
+        log('failed increasing score, match not found')
+        return
     }
+
+    // increase score
+    if (match.player1 === player) {
+        match.score1 += scoreChange
+    } else {
+        match.score2 += scoreChange
+    }
+    self.matches = matches
 }
 
 export function getPlayersUniqueFromMatches(matches: Match[]) {

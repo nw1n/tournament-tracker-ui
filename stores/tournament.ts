@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { formatTime, insertionSortObjs, log } from '~/lib/Util'
 import _ from 'lodash'
-import { getAllTournamentScores, TournamentStoreActions } from '~/lib/TournamentStoreFn'
+import { changeScore, getAllTournamentScores } from '~/lib/TournamentStoreFn'
 import { MatchMaker } from '~/lib/MatchMaker'
 
 export interface Match {
@@ -95,7 +95,7 @@ export const useTournamentStore = defineStore('tournament', {
         },
 
         changeScore(round: number, player: string, scoreChange: number) {
-            TournamentStoreActions.changeScore(this, round, player, scoreChange)
+            changeScore(this, round, player, scoreChange)
         },
     },
 
