@@ -49,8 +49,8 @@ export class MatchMaker {
             // TODO: sort by score
             // const playersCloneShuffledSortedByScore = ...
 
-            // create pairs
-            playerPairsSorted = createPlayerPairsFromList(playersCloneShuffled)
+            // create player pairs that are each sorted alphabetically
+            playerPairsSorted = _.chunk(playersCloneShuffled, 2).map((pair) => pair.sort())
 
             // check if players have met too many times
             if (isPlayerPairsFreeOfPairsThatPlayedBefore(playerPairsSorted, meets)) {
@@ -102,11 +102,6 @@ function isPlayerPairsFreeOfPairsThatPlayedBefore(playerPairs: string[][], previ
         }
     }
     return true
-}
-
-function createPlayerPairsFromList(playersList: string[]): string[][] {
-    // create pairs and sort the two players in each pair by name
-    return _.chunk(playersList, 2).map((pair) => pair.sort())
 }
 
 function getByeRatios(state: any) {
@@ -181,17 +176,10 @@ export function getByeRatiosSorted(state: any) {
 
 export function getNumberOfMeetsBetweenPlayers(state: any) {
     const meets = {} as any
-    for (const match of state.matches) {
-        if (match.player1 === 'BYE' || match.player2 === 'BYE') {
-            continue
-        }
-        const players = [match.player1, match.player2]
-        players.sort()
-        const key = players.join('-')
-        if (!meets[key]) {
-            meets[key] = 0
-        }
-        meets[key]++
+    const matchesFilteredForByes = state.matches.filter((m: Match) => [m.player1, m.player2].includes('BYE') === false)
+    for (const match of matchesFilteredForByes) {
+        const key = [match.player1, match.player2].sort().join('-')
+        meets[key] = meets[key] ? meets[key] + 1 : 1
     }
     return meets
 }
