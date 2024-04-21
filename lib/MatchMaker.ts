@@ -6,7 +6,6 @@ import { getAllTournamentScores } from './TournamentStoreFn'
 export class MatchMaker {
     public store: TournamentStateExtended
     public byePlayer = ''
-    public playerPairs: string[][] = []
 
     constructor(store: TournamentStateExtended) {
         this.store = store
@@ -14,9 +13,8 @@ export class MatchMaker {
 
     public run() {
         this.setByePlayer()
-        const playersListFilteredForActivePlayersWithoutByePlayer = this.createPlayersListFilteredForBye()
-        this.playerPairs = this.createPlayerPairs(playersListFilteredForActivePlayersWithoutByePlayer)
-        this.persistPlayerPairsToMatches(this.playerPairs)
+        const playerPairs = this.createPlayerPairs()
+        this.persistPlayerPairsToMatches(playerPairs)
     }
 
     public setByePlayer() {
@@ -27,11 +25,7 @@ export class MatchMaker {
     }
 
     public createPlayersListFilteredForBye() {
-        // filter players that are not in players array
-        const players = _.cloneDeep(this.store.players)
-
-        // remove bye player
-        return players.filter((player) => {
+        return this.store.players.filter((player) => {
             if (this.byePlayer) {
                 return player !== this.byePlayer
             }
@@ -39,12 +33,14 @@ export class MatchMaker {
         })
     }
 
-    public createPlayerPairs(tournamentPlayerScoreMapFilteredForActivePlayersWithoutByePlayer: any[] = []): string[][] {
+    public createPlayerPairs(): string[][] {
         // try avoid players meeting each other too many times
         const meets = getNumberOfMeetsBetweenPlayers(this.store.$state)
 
+        const playersListFilteredForBye = this.createPlayersListFilteredForBye()
+
         const playerPairsSorted = tryFindingGoodPairings(
-            tournamentPlayerScoreMapFilteredForActivePlayersWithoutByePlayer,
+            playersListFilteredForBye,
             meets,
         )
 
