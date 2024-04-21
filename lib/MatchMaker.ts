@@ -5,9 +5,11 @@ import { log, insertionSortObjs } from '~/lib/Util'
 export class MatchMaker {
     public store: TournamentStateExtended
     public byePlayer = ''
+    public previousMeets: any = {}
 
     constructor(store: TournamentStateExtended) {
         this.store = store
+        this.previousMeets = getNumberOfMeetsBetweenPlayers(this.store.$state)
     }
 
     public run() {
@@ -33,15 +35,9 @@ export class MatchMaker {
     }
 
     public createPlayerPairs(): string[][] {
-        // try avoid players meeting each other too many times
-        const meets = getNumberOfMeetsBetweenPlayers(this.store.$state)
-
         const playersListFilteredForBye = this.createPlayersListFilteredForBye()
 
-        const playerPairsSorted = tryFindingGoodPairings(
-            playersListFilteredForBye,
-            meets,
-        )
+        const playerPairsSorted = tryFindingGoodPairings(playersListFilteredForBye, this.previousMeets)
 
         // if there is a bye player, add it to the end of the array
         if (this.byePlayer) {
