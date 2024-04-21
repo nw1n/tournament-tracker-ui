@@ -99,9 +99,9 @@ const trySavingDataToServer = () => {
 }
 
 const saveDataToServer = async () => {
-    console.log('saving data to server')
+    log('saving data to server')
     const result = await ServerApi.getInstance().postTournamentData(tournament.finishedMatches)
-    console.log('result', result)
+    log('result', result)
 }
 
 const endTournament = () => {

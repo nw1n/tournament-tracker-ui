@@ -18,23 +18,25 @@ export class ServerApi {
     async postTournamentData(finishedMatches: any[]) {
         const url = new URL('save-tournament/', this.serverUrl)
         console.log('post tournament data to url', url)
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                tournament: JSON.stringify(finishedMatches),
-                password: this.serverPassword,
-            }),
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                console.log('Success:', data)
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    tournament: JSON.stringify(finishedMatches),
+                    password: this.serverPassword,
+                }),
             })
-            .catch((error) => {
-                console.error('Error:', error)
-            })
+
+            const data = await response.json()
+            console.log('Success:', data)
+            return data
+        } catch (error) {
+            console.error('Error:', error)
+        }
     }
 
     get settings(): SettingsState {
