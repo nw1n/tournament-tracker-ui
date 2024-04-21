@@ -1,7 +1,6 @@
 import _ from 'lodash'
 import type { Match, TournamentState, TournamentStateExtended } from '../stores/tournament'
 import { log, insertionSortObjs } from '~/lib/Util'
-import { getAllTournamentScores } from './TournamentStoreFn'
 
 export class MatchMaker {
     public store: TournamentStateExtended
