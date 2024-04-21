@@ -8,6 +8,7 @@ const tournament = useTournamentStore()
 const errorMessage = ref('')
 const newPlayer = ref('')
 const inputLabel = ref(null)
+const predefinedPlayers = ['Alice', 'Bob', 'Charlie', 'David']
 
 const addPlayer = () => {
     const newPlayerName = newPlayer.value.trim()
@@ -63,6 +64,25 @@ const continueTournament = () => {
 <template>
     <div class="">
         <div class="">
+            <div id="list-of-predefined-player">
+                <h1 class="mb-8">Predefined Players</h1>
+                <div v-for="(player, index) in predefinedPlayers" :key="player">
+                    <div :class="`${tournament.players.includes(player) ? 'bg-blue-600' : ''}`">
+                        <p class="player-name flex justify-between">
+                            <span
+                                class=""
+                                @click="
+                                    tournament.players.includes(player)
+                                        ? tournament.removePlayer(player)
+                                        : tournament.addPlayer(player)
+                                "
+                            >
+                                {{ player }}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            </div>
             <div id="list-of-created-players">
                 <h1 class="mb-8">Players</h1>
                 <div v-for="(player, index) in tournament.players" :key="player">
