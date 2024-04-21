@@ -4,7 +4,7 @@ import { useUiStore } from '@/stores/ui'
 import { useSettingsStore } from '@/stores/settings'
 import { millisecondsToTime } from '../lib/Util'
 import { onMounted, onUnmounted } from 'vue'
-import { ServerApi } from '~/lib/ServerApi.js'
+import { ServerApi } from '~/lib/ServerApi'
 
 const tournament = useTournamentStore()
 const uiStore = useUiStore()
@@ -98,7 +98,7 @@ const trySavingDataToServer = () => {
     }
 }
 
-const saveDataToServer = () => {
+const saveDataToServer = async () => {
     console.log('saving data to server')
     const result = await ServerApi.getInstance().postTournamentData(tournament.finishedMatches)
     console.log('result', result)
