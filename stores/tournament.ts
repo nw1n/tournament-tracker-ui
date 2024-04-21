@@ -97,14 +97,6 @@ export const useTournamentStore = defineStore('tournament', {
         changeScore(round: number, player: string, scoreChange: number) {
             TournamentStoreActions.changeScore(this, round, player, scoreChange)
         },
-
-        // Getter Actions
-        // ------------------------------------------------------------------
-
-        // TO DO: MOVE TO STATIC FUNCTION
-        getTimePassedSinceStartOfCurrentRound(): number {
-            return TournamentStoreActions.getTimePassedSinceStartOfCurrentRound(this)
-        },
     },
 
     getters: {

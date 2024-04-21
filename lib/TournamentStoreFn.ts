@@ -23,18 +23,6 @@ export class TournamentStoreActions {
         }
         self.matches = matches
     }
-
-    static getTimePassedSinceStartOfCurrentRound(self: TournamentStateExtended): number {
-        const state = self.$state
-        const match = state.matches.find((m) => m.round === state.roundNr)
-        if (!match || !match.dateStarted) {
-            log('no match or dateStarted found for round', state.roundNr, match)
-            return 0
-        }
-        const currentTime = new Date()
-        const matchDateStarted = new Date(match.dateStarted)
-        return currentTime.getTime() - matchDateStarted.getTime()
-    }
 }
 
 export function getPlayersUniqueFromMatches(matches: Match[]) {

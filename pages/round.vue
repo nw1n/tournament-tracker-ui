@@ -28,8 +28,19 @@ const clearTimerInterval = () => {
     }
 }
 
+function getTimePassedSinceStartOfCurrentRound(matches, roundNr) {
+    const match = matches.find((m) => m.round === roundNr)
+    if (!match || !match.dateStarted) {
+        console.log('no match or dateStarted found for round', roundNr, match)
+        return 0
+    }
+    const currentTime = new Date()
+    const matchDateStarted = new Date(match.dateStarted)
+    return currentTime.getTime() - matchDateStarted.getTime()
+}
+
 const updateTimeRemaining = () => {
-    const timePassed = tournament.getTimePassedSinceStartOfCurrentRound()
+    const timePassed = getTimePassedSinceStartOfCurrentRound(tournament.matches, tournament.roundNr)
     const timeRemainingMs = settings.roundTimeInMilliSeconds - timePassed
 
     if (timeRemainingMs < 0) {
