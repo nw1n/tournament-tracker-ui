@@ -14,9 +14,8 @@ export class MatchMaker {
 
     public run() {
         this.setByePlayer()
-        const playerScoreMapFilteredForActivePlayersWithoutByePlayer =
-            this.createPlayerScoreMapFilteredForActivePlayersAndBye()
-        this.playerPairs = this.createPlayerPairs(playerScoreMapFilteredForActivePlayersWithoutByePlayer)
+        const playersListFilteredForActivePlayersWithoutByePlayer = this.createPlayersListFilteredForBye()
+        this.playerPairs = this.createPlayerPairs(playersListFilteredForActivePlayersWithoutByePlayer)
         this.persistPlayerPairsToMatches(this.playerPairs)
     }
 
@@ -27,58 +26,27 @@ export class MatchMaker {
         this.byePlayer = this.getPlayerWithHighestByeRatio()
     }
 
-    public createPlayerScoreMapFilteredForActivePlayersAndBye() {
-        // clone players array. MAJOR ISSUE: bad practice using getAllTournamentScores here
-        let tournamentPlayerScoreMap = _.cloneDeep(this.store.players)
-
-        console.log('tournamentPlayerScoreMap', tournamentPlayerScoreMap)
-
+    public createPlayersListFilteredForBye() {
         // filter players that are not in players array
-        const playerScoreMapFilteredForActivePlayers = tournamentPlayerScoreMap.filter((player) =>
-            this.store.players.includes(player),
-        )
+        const players = _.cloneDeep(this.store.players)
 
         // remove bye player
-        const playerScoreMapFilteredForActivePlayersWithoutByePlayer = playerScoreMapFilteredForActivePlayers.filter(
-            (player) => {
-                if (this.byePlayer) {
-                    return player !== this.byePlayer
-                }
-                return true
-            },
-        )
-        return playerScoreMapFilteredForActivePlayersWithoutByePlayer
+        return players.filter((player) => {
+            if (this.byePlayer) {
+                return player !== this.byePlayer
+            }
+            return true
+        })
     }
 
     public createPlayerPairs(tournamentPlayerScoreMapFilteredForActivePlayersWithoutByePlayer: any[] = []): string[][] {
         // try avoid players meeting each other too many times
         const meets = getNumberOfMeetsBetweenPlayers(this.store.$state)
 
-        let playerPairsSorted: string[][] = []
-        let isGoodMatchupsFound = false
-
-        let i = 0
-        for (i = 0; i < 100000; i++) {
-            // shuffle players
-            const playersCloneShuffled = _.shuffle(tournamentPlayerScoreMapFilteredForActivePlayersWithoutByePlayer)
-
-            // TODO: sort by score
-            // const playersCloneShuffledSortedByScore = ...
-
-            playerPairsSorted = createPlayerPairsFromList(playersCloneShuffled)
-
-            // check if players have met too many times
-            if (isPlayerPairsFreeOfPairsThatPlayedBefore(playerPairsSorted, meets)) {
-                log('found unique matchups. used tries: ' + i)
-                isGoodMatchupsFound = true
-                // break outer for loop
-                break
-            }
-        }
-
-        if (!isGoodMatchupsFound) {
-            log('no unique matchups found. use repeated matchups. used tries: ' + i)
-        }
+        const playerPairsSorted = tryFindingGoodPairings(
+            tournamentPlayerScoreMapFilteredForActivePlayersWithoutByePlayer,
+            meets,
+        )
 
         // if there is a bye player, add it to the end of the array
         if (this.byePlayer) {
@@ -116,6 +84,36 @@ export class MatchMaker {
 
 // ------------------------------------------------------------------------------------------------
 // helper functions
+function tryFindingGoodPairings(playersList: string[], meets: any) {
+    let playerPairsSorted: string[][] = []
+    let isGoodMatchupsFound = false
+    const maxTries = 100000
+
+    for (let i = 0; i < maxTries; i++) {
+        // shuffle players
+        const playersCloneShuffled = _.shuffle(playersList)
+
+        // TODO: sort by score
+        // const playersCloneShuffledSortedByScore = ...
+
+        // create pairs
+        playerPairsSorted = createPlayerPairsFromList(playersCloneShuffled)
+
+        // check if players have met too many times
+        if (isPlayerPairsFreeOfPairsThatPlayedBefore(playerPairsSorted, meets)) {
+            log('found unique matchups. used tries: ' + i)
+            isGoodMatchupsFound = true
+            break
+        }
+    }
+
+    if (!isGoodMatchupsFound) {
+        log('no unique matchups found. use repeated matchups. used tries: ' + maxTries)
+    }
+
+    return playerPairsSorted
+}
+
 function isPlayerPairsFreeOfPairsThatPlayedBefore(playerPairs: string[][], previousMeets: any) {
     for (const pair of playerPairs) {
         const key = pair.join('-')
