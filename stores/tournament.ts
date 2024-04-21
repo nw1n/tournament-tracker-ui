@@ -134,11 +134,6 @@ export const useTournamentStore = defineStore('tournament', {
 
         // getters with argument
         // ------------------------------------------------------------------
-        isBuyMatch(state): (match: Match) => boolean {
-            return (match: Match) => {
-                return [match.player1, match.player2].includes('BYE')
-            }
-        },
 
         matchesByRound(state): (round: number) => Match[] {
             return (round: number) => state.matches.filter((m) => m.round === round)

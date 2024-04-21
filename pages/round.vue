@@ -136,13 +136,13 @@ const changePlayers = () => {
                 <div
                     v-for="(match, matchIndex) in tournament.matchesByRound(tournament.roundNr)"
                     :key="matchIndex"
-                    :class="`${tournament.isBuyMatch(match) ? 'is-buy-match-scores' : 'is-non-buy-match-scores'} round-matches-scores gap-4 flex mt-12`"
+                    :class="`${match.player2 === 'BYE' ? 'is-buy-match-scores' : 'is-non-buy-match-scores'} round-matches-scores gap-4 flex mt-12`"
                 >
                     <div class="w-24 player-section">
                         <div class="player-name">{{ match.player1 }}</div>
                         <div class="player-score">{{ match.score1 }}</div>
 
-                        <div v-if="!tournament.isBuyMatch(match) && match.round === tournament.roundNr">
+                        <div v-if="!(match.player2 === 'BYE') && match.round === tournament.roundNr">
                             <button @click="tournament.changeScore(tournament.roundNr, match.player1, 1)">+</button>
                             <button @click="tournament.changeScore(tournament.roundNr, match.player1, -1)">-</button>
                         </div>
@@ -152,7 +152,7 @@ const changePlayers = () => {
                         <div class="player-name">{{ match.player2 }}</div>
                         <div class="player-score">{{ match.score2 }}</div>
 
-                        <div v-if="!tournament.isBuyMatch(match) && match.round === tournament.roundNr">
+                        <div v-if="!(match.player2 === 'BYE') && match.round === tournament.roundNr">
                             <button @click="tournament.changeScore(tournament.roundNr, match.player2, 1)">+</button>
                             <button @click="tournament.changeScore(tournament.roundNr, match.player2, -1)">-</button>
                         </div>
