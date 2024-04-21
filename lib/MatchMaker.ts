@@ -138,7 +138,7 @@ function getTotalByes(state: any) {
     return byeRatios
 }
 
-export function getNumberOfMatchesPlayedByPlayer(state: any) {
+function getNumberOfMatchesPlayedByPlayer(state: any) {
     const matchesPlayed = {} as any
     const matches = state.matches.filter((m: Match) => m.round <= state.finishedRoundNr)
     for (const match of matches) {
@@ -160,7 +160,7 @@ export function getNumberOfMatchesPlayedByPlayer(state: any) {
     return matchesPlayed
 }
 
-export function getByeRatiosSorted(state: any) {
+function getByeRatiosSorted(state: any) {
     const src = getByeRatios(state)
     let result = [] as any[]
     for (const player of Object.keys(src)) {
@@ -174,7 +174,8 @@ export function getByeRatiosSorted(state: any) {
     return result
 }
 
-export function getNumberOfMeetsBetweenPlayers(state: any): Map<string, number> {
+
+function getNumberOfMeetsBetweenPlayers(state: any): Map<string, number> {
     const meets = new Map<string, number>()
 
     const matchesFilteredForByes = state.matches.filter((m: Match) => ![m.player1, m.player2].includes('BYE'))
