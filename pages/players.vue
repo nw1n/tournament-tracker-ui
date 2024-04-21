@@ -1,14 +1,15 @@
 <script setup>
 import { useTournamentStore } from '~/stores/tournament'
+import { useSettingsStore } from '~/stores/settings'
 import { getRandomName } from '~/lib/getRandomNameForTesting'
 import { Config } from '@/lib/Config'
 
 const tournament = useTournamentStore()
+const settings = useSettingsStore()
 
 const errorMessage = ref('')
 const newPlayer = ref('')
 const inputLabel = ref(null)
-const predefinedPlayers = ['Alice', 'Bob', 'Charlie', 'David']
 
 const addPlayer = () => {
     const newPlayerName = newPlayer.value.trim()
@@ -66,19 +67,17 @@ const continueTournament = () => {
         <div class="">
             <div id="list-of-predefined-player">
                 <h1 class="mb-8">Predefined Players</h1>
-                <div v-for="(player, index) in predefinedPlayers" :key="player">
+                <div v-for="(player, index) in settings.predefinedPlayers" :key="player">
                     <div :class="`${tournament.players.includes(player) ? 'bg-blue-600' : ''}`">
-                        <p class="player-name flex justify-between">
-                            <span
-                                class=""
-                                @click="
-                                    tournament.players.includes(player)
-                                        ? tournament.removePlayer(player)
-                                        : tournament.addPlayer(player)
-                                "
-                            >
-                                {{ player }}
-                            </span>
+                        <p
+                            class="player-name flex justify-between"
+                            @click="
+                                tournament.players.includes(player)
+                                    ? tournament.removePlayer(player)
+                                    : tournament.addPlayer(player)
+                            "
+                        >
+                            {{ player }}
                         </p>
                     </div>
                 </div>

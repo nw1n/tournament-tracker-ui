@@ -7,6 +7,7 @@ export interface SettingsState {
     password: string
     roundTimeMinutes: number
     isDebugMode: boolean
+    predefinedPlayers: string[]
 }
 
 export const useSettingsStore = defineStore('settings', {
@@ -15,6 +16,7 @@ export const useSettingsStore = defineStore('settings', {
         password: '',
         roundTimeMinutes: 30,
         isDebugMode: false,
+        predefinedPlayers: ['Alice', 'Bob', 'Charlie', 'David'], // TMP
     }),
     getters: {
         roundTimeInMilliSeconds: (state) => {
