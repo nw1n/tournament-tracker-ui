@@ -1,13 +1,9 @@
 import _ from 'lodash'
-import type { Match, TournamentState, TournamentStateExtended } from '../stores/tournament'
-import { insertionSortObjs, log } from '~/lib/Util'
-import { MatchMaker } from './MatchMaker'
+import type { Match, TournamentStateExtended } from '../stores/tournament'
+import { log } from '~/lib/Util'
 
-export function changeScore(self: TournamentStateExtended, round: number, player: string, scoreChange: number = 1) {
-    log(`increaseScore round ${round} player ${player}`)
-    const matches = _.cloneDeep(self.matches)
-    // find match by round and player
-    const match = matches.find((m) => m.round === round && [m.player1, m.player2].includes(player))
+export function changeScore(self: TournamentStateExtended, round: number, player: string, scoreChange: number) {
+    const match = self.matches.find((m) => m.round === round && [m.player1, m.player2].includes(player))
 
     if (!match) {
         log('failed increasing score, match not found')
@@ -20,7 +16,9 @@ export function changeScore(self: TournamentStateExtended, round: number, player
     } else {
         match.score2 += scoreChange
     }
-    self.matches = matches
+
+    // trigger update
+    self.matches = self.matches.slice()
 }
 
 export function getPlayersUniqueFromMatches(matches: Match[]) {

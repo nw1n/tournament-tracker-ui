@@ -53,7 +53,7 @@ const tournament = useTournamentStore()
                             <div>{{ match.score1 }}</div>
 
                             <div v-if="!(match.player2 === 'BYE') && match.round === tournament.roundNr">
-                                <button @click="tournament.changeScore(tournament.roundNr, match.player1)">
+                                <button @click="tournament.changeScore(tournament.roundNr, match.player1, 1)">
                                     Score++
                                 </button>
                                 <button @click="tournament.changeScore(tournament.roundNr, match.player1, -1)">
@@ -67,7 +67,7 @@ const tournament = useTournamentStore()
                             <div>{{ match.score2 }}</div>
 
                             <div v-if="!(match.player2 === 'BYE') && match.round === tournament.roundNr">
-                                <button @click="tournament.changeScore(tournament.roundNr, match.player2)">
+                                <button @click="tournament.changeScore(tournament.roundNr, match.player2, 1)">
                                     Score++
                                 </button>
                                 <button @click="tournament.changeScore(tournament.roundNr, match.player2, -1)">
