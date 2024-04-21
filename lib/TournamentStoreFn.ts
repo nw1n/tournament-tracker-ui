@@ -4,11 +4,6 @@ import { insertionSortObjs, log } from '~/lib/Util'
 import { MatchMaker } from './MatchMaker'
 
 export class TournamentStoreActions {
-    static createMatchesForRound(store: TournamentStateExtended) {
-        const matchMaker = new MatchMaker(store)
-        matchMaker.run()
-    }
-
     static changeScore(self: TournamentStateExtended, round: number, player: string, scoreChange: number = 1) {
         log(`increaseScore round ${round} player ${player}`)
         const matches = _.cloneDeep(self.matches)
@@ -40,92 +35,6 @@ export class TournamentStoreActions {
         const matchDateStarted = new Date(match.dateStarted)
         return currentTime.getTime() - matchDateStarted.getTime()
     }
-}
-
-export function getNumberOfMeetsBetweenPlayers(state: any) {
-    const meets = {} as any
-    for (const match of state.matches) {
-        if (match.player1 === 'BYE' || match.player2 === 'BYE') {
-            continue
-        }
-        const players = [match.player1, match.player2]
-        players.sort()
-        const key = players.join('-')
-        if (!meets[key]) {
-            meets[key] = 0
-        }
-        meets[key]++
-    }
-    return meets
-}
-
-export function getTotalByes(state: any) {
-    const byeRatios = {} as any
-    for (const player of state.players) {
-        byeRatios[player] = 0
-    }
-    for (const match of state.matches) {
-        if (match.player2 === 'BYE') {
-            byeRatios[match.player1]++
-        }
-        if (match.player1 === 'BYE') {
-            byeRatios[match.player2]++
-        }
-    }
-    return byeRatios
-}
-
-export function getByeRatiosSorted(state: any) {
-    const src = getByeRatios(state)
-    let result = [] as any[]
-    for (const player of Object.keys(src)) {
-        result.push({
-            player,
-            ratio: src[player],
-        })
-    }
-    result = _.shuffle(result)
-    result = insertionSortObjs(result, 'ratio')
-    return result
-}
-
-export function getNumberOfMatchesPlayedByPlayer(state: any) {
-    const matchesPlayed = {} as any
-    const matches = state.matches.filter((m: Match) => m.round <= state.finishedRoundNr)
-    for (const match of matches) {
-        if (match.player1 !== 'BYE') {
-            const playerName = match.player1
-            if (!matchesPlayed[playerName]) {
-                matchesPlayed[playerName] = 0
-            }
-            matchesPlayed[playerName]++
-        }
-        if (match.player2 !== 'BYE') {
-            const playerName = match.player2
-            if (!matchesPlayed[playerName]) {
-                matchesPlayed[playerName] = 0
-            }
-            matchesPlayed[playerName]++
-        }
-    }
-    return matchesPlayed
-}
-
-export function getByeRatios(state: any) {
-    const totalByes = getTotalByes(state) as any
-    const matchesPlayedByPlayer = getNumberOfMatchesPlayedByPlayer(state) as any
-    log(matchesPlayedByPlayer)
-    const byeRatios = {} as any
-    for (const player of state.players) {
-        byeRatios[player] = 0
-        const byes = totalByes[player]
-        const matchesPlayed = matchesPlayedByPlayer[player]
-        if (!matchesPlayed || !byes) {
-            continue
-        }
-        byeRatios[player] = totalByes[player] / matchesPlayedByPlayer[player]
-    }
-    return byeRatios
 }
 
 export function getPlayersUniqueFromMatches(matches: Match[]) {

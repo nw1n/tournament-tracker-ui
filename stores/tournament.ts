@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia'
 import { formatTime, insertionSortObjs, log } from '~/lib/Util'
 import _ from 'lodash'
-import { getAllTournamentScores, getByeRatiosSorted, TournamentStoreActions } from '~/lib/TournamentStoreFn'
+import { getAllTournamentScores, TournamentStoreActions } from '~/lib/TournamentStoreFn'
+import { MatchMaker } from '~/lib/MatchMaker'
 
 export interface Match {
     round: number
@@ -83,7 +84,8 @@ export const useTournamentStore = defineStore('tournament', {
         },
 
         createMatchesForRound() {
-            TournamentStoreActions.createMatchesForRound(this)
+            const matchMaker = new MatchMaker(this)
+            matchMaker.run()
         },
 
         endRoundAndCreateNewMatches() {
@@ -98,6 +100,8 @@ export const useTournamentStore = defineStore('tournament', {
 
         // Getter Actions
         // ------------------------------------------------------------------
+
+        // TO DO: MOVE TO STATIC FUNCTION
         getTimePassedSinceStartOfCurrentRound(): number {
             return TournamentStoreActions.getTimePassedSinceStartOfCurrentRound(this)
         },
@@ -112,17 +116,9 @@ export const useTournamentStore = defineStore('tournament', {
             return state.matches.length > 0
         },
 
-        allTournamentScores(state): any[] {
-            return getAllTournamentScores(state)
-        },
-
         allTournamentScoresSorted(state): any[] {
-            const scores = this.allTournamentScores.slice()
+            const scores = getAllTournamentScores(state).slice()
             return insertionSortObjs(scores, 'score', 'desc')
-        },
-
-        byeRatios(state) {
-            return getByeRatiosSorted(state)
         },
 
         timeCurrentRoundStarted(state): string | undefined {
