@@ -2,7 +2,7 @@
 import { useTournamentStore } from '~/stores/tournament'
 import { useUiStore } from '@/stores/ui'
 import { useSettingsStore } from '@/stores/settings'
-import { millisecondsToTime } from '../lib/Util'
+import { log, millisecondsToTime } from '../lib/Util'
 import { onMounted, onUnmounted } from 'vue'
 import { ServerApi } from '~/lib/ServerApi'
 
