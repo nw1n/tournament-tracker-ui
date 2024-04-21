@@ -4,7 +4,6 @@ import { useUiStore } from '@/stores/ui'
 import { useSettingsStore } from '@/stores/settings'
 import { millisecondsToTime } from '../lib/Util'
 import { onMounted, onUnmounted } from 'vue'
-import { set } from 'lodash'
 
 const tournament = useTournamentStore()
 const uiStore = useUiStore()
