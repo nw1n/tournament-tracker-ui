@@ -1,13 +1,11 @@
 <script setup>
 import { useTournamentStore } from '~/stores/tournament'
-import { useUiStore } from '@/stores/ui'
 import { useSettingsStore } from '@/stores/settings'
 import { log, millisecondsToTime } from '../lib/Util'
 import { onMounted, onUnmounted } from 'vue'
 import { ServerApi } from '~/lib/ServerApi'
 
 const tournament = useTournamentStore()
-const uiStore = useUiStore()
 const settings = useSettingsStore()
 
 const isEndRoundMenuOpen = ref(false)
@@ -90,14 +88,6 @@ const endRound = () => {
     initTimerRender()
 }
 
-const trySavingDataToServer = () => {
-    try {
-        saveDataToServer()
-    } catch (e) {
-        console.error('error saving data to server', e)
-    }
-}
-
 const saveDataToServer = async () => {
     log('saving data to server')
     const result = await ServerApi.getInstance().postTournamentData(tournament.finishedMatches)
@@ -106,12 +96,12 @@ const saveDataToServer = async () => {
 
 const endTournament = () => {
     tournament.endRound()
-    trySavingDataToServer()
+    saveDataToServer()
     navigateTo('/end')
 }
 
 const ignoreRoundAndEndTournament = () => {
-    trySavingDataToServer()
+    saveDataToServer()
     navigateTo('/end')
 }
 
