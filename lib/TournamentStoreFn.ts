@@ -24,11 +24,15 @@ export function changeScore(self: TournamentStateExtended, round: number, player
 }
 
 export function getPlayersUniqueFromMatches(matches: Match[]) {
-    const players: string[] = matches.map((m) => [m.player1, m.player2]).flat()
-    const uniquePlayers = Array.from(new Set(players))
-    const filteredPlayers = uniquePlayers.filter((p) => p !== 'BYE')
-    log('players', filteredPlayers)
-    return filteredPlayers
+    const playersSet = new Set<string>()
+
+    for (const match of matches) {
+        playersSet.add(match.player1)
+        playersSet.add(match.player2)
+    }
+
+    playersSet.delete('BYE')
+    return Array.from(playersSet)
 }
 
 export function getAllTournamentScores(state: any) {
@@ -65,25 +69,18 @@ export function getAllTournamentScores(state: any) {
 }
 
 export function getTournamentScoresFromMatch(match: Match): any {
-    const isDraw = match.score1 === match.score2
-    const isPlayer1Winner = match.score1 > match.score2
-    const isPlayer2Winner = match.score1 < match.score2
-    if (isDraw) {
-        return {
-            [match.player1]: 1,
-            [match.player2]: 1,
-        }
+    let result = [1, 1]
+
+    if (match.score1 > match.score2) {
+        result = [2, 0]
     }
-    if (isPlayer1Winner) {
-        return {
-            [match.player1]: 2,
-            [match.player2]: 0,
-        }
+    // case player2 wins
+    if (match.score1 < match.score2) {
+        result = [0, 2]
     }
-    if (isPlayer2Winner) {
-        return {
-            [match.player1]: 0,
-            [match.player2]: 2,
-        }
+
+    return {
+        [match.player1]: result[0],
+        [match.player2]: result[1],
     }
 }
