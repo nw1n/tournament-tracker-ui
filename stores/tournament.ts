@@ -18,6 +18,7 @@ export interface TournamentState {
     roundNr: number
     finishedRoundNr: number
     players: string[]
+    playersExcludedFromBye: string[]
     startDate?: Date
     id: number
     matches: Match[]
@@ -36,6 +37,7 @@ export const useTournamentStore = defineStore('tournament', {
         roundNr: 0,
         finishedRoundNr: 0,
         players: [],
+        playersExcludedFromBye: [],
         startDate: undefined,
         id: 0,
         matches: [],
@@ -46,6 +48,7 @@ export const useTournamentStore = defineStore('tournament', {
             this.roundNr = 0
             this.finishedRoundNr = 0
             this.players = []
+            this.playersExcludedFromBye = []
             this.startDate = undefined
             this.id = 0
             this.matches = []
@@ -83,12 +86,17 @@ export const useTournamentStore = defineStore('tournament', {
             this.players.push(player)
         },
 
-        removePlayer(player: string) {
-            this.players = this.players.filter((p) => p !== player)
+        addPlayerExcludedFromBye(player: string) {
+            this.playersExcludedFromBye.push(player)
         },
 
-        resetPlayers() {
-            this.players = []
+        removePlayer(player: string) {
+            this.players = this.players.filter((p) => p !== player)
+            this.removePlayerExcludedFromBye(player)
+        },
+
+        removePlayerExcludedFromBye(player: string) {
+            this.playersExcludedFromBye = this.playersExcludedFromBye.filter((p) => p !== player)
         },
 
         endRound() {

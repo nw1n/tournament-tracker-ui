@@ -19,10 +19,23 @@ export class MatchMaker {
     }
 
     setByePlayer() {
-        if (this.isEvenNumberOfPlayers) {
+        this.byePlayer = ''
+        if (this.isEvenNumberOfPlayers || !this.byeRatiosOfTournamentSorted?.length) {
             return
         }
-        this.byePlayer = this.playerWithHighestByeRatio
+        const ratiosFilteredForExcludedPlayers = this.byeRatiosOfTournamentSorted.filter(
+            (ratio) => !this.store.playersExcludedFromBye.includes(ratio.player),
+        )
+        if (!ratiosFilteredForExcludedPlayers.length) {
+            return
+        }
+        const playerWithLowestRatio = ratiosFilteredForExcludedPlayers[0].player
+        this.byePlayer = playerWithLowestRatio
+        // if (false) {
+        //     // set bye player to the player with the lowest bye ratio
+        //     const playerWithLowestRatio = this.byeRatiosOfTournamentSorted[0].player
+        //     this.byePlayer = playerWithLowestRatio
+        // }
     }
 
     createPlayerPairs() {
@@ -66,10 +79,6 @@ export class MatchMaker {
 
     get isEvenNumberOfPlayers() {
         return this.store.players.length % 2 === 0
-    }
-
-    get playerWithHighestByeRatio(): string {
-        return this.byeRatiosOfTournamentSorted?.length ? this.byeRatiosOfTournamentSorted[0].player : ''
     }
 }
 
