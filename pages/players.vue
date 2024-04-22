@@ -83,11 +83,8 @@ function continueTournament() {
                 </div>
             </div>
             <div id="list-of-created-players">
-                <h1 class="mb-8">Custom Players</h1>
-                <div
-                    v-for="(player, index) in tournament.players.filter((p) => !settings.predefinedPlayers.includes(p))"
-                    :key="player"
-                >
+                <h1 class="mb-8">Players</h1>
+                <div v-for="(player, index) in tournament.players" :key="player">
                     <p class="player-name flex justify-between">
                         {{ player }}
                         <button
