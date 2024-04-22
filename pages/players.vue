@@ -65,23 +65,6 @@ function continueTournament() {
 <template>
     <div class="">
         <div class="">
-            <div id="list-of-bye.excluded-players">
-                <h1 class="mb-8">Bye-Excluded Players</h1>
-                <div v-for="(player, index) in tournament.players" :key="player">
-                    <div>
-                        <button
-                            :class="`${tournament.playersExcludedFromBye.includes(player) ? 'bg-blue-400' : ''} player-name flex justify-between block w-full`"
-                            @click="
-                                tournament.playersExcludedFromBye.includes(player)
-                                    ? tournament.removePlayerExcludedFromBye(player)
-                                    : tournament.addPlayerExcludedFromBye(player)
-                            "
-                        >
-                            {{ player }}
-                        </button>
-                    </div>
-                </div>
-            </div>
             <div id="list-of-predefined-player">
                 <h1 class="mb-8">Predefined Players</h1>
                 <div v-for="(player, index) in settings.predefinedPlayers" :key="player">
@@ -144,6 +127,23 @@ function continueTournament() {
             </div>
             <div v-else class="mt-12">
                 <button @click="startTournament" id="finish-player-creation-btn">Start tournament</button>
+            </div>
+            <div id="list-of-bye.excluded-players" class="mt-48">
+                <h1 class="mb-8">Bye-Excluded Players</h1>
+                <div v-for="(player, index) in tournament.players" :key="player">
+                    <div>
+                        <button
+                            :class="`${tournament.playersExcludedFromBye.includes(player) ? 'bg-blue-400' : ''} player-name flex justify-between block w-full`"
+                            @click="
+                                tournament.playersExcludedFromBye.includes(player)
+                                    ? tournament.removePlayerExcludedFromBye(player)
+                                    : tournament.addPlayerExcludedFromBye(player)
+                            "
+                        >
+                            {{ player }}
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
