@@ -71,19 +71,6 @@ export class MatchMaker {
     get playerWithHighestByeRatio(): string {
         return this.byeRatiosSorted?.length ? this.byeRatiosSorted[0].player : ''
     }
-
-    get byesOfCurrentTournament(): Map<string, number> {
-        const byesMap = new Map<string, number>()
-        const byeMatches = this.store.$state.matches.filter((m: Match) => m.player2 === 'BYE')
-        for (const match of byeMatches) {
-            byesMap.set(match.player1, byesMap.get(match.player1) ? byesMap.get(match.player1)! + 1 : 1)
-        }
-        return byesMap
-    }
-
-    getNumberOfByesForPlayer(player: string): number {
-        return this.byesOfCurrentTournament.get(player) || 0
-    }
 }
 
 // ------------------------------------------------------------------------------------------------
