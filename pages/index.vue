@@ -3,6 +3,8 @@ import { useTournamentStore } from '~/stores/tournament'
 import { useUiStore } from '@/stores/ui'
 import { useSettingsStore } from '@/stores/settings'
 import { ref } from 'vue'
+import { ServerApi } from '~/lib/ServerApi'
+import { log } from '~/lib/Util'
 
 definePageMeta({
     layout: 'full',
@@ -15,6 +17,15 @@ const settings = useSettingsStore()
 async function startTournament() {
     tournament.endAndReset()
     tournament.init()
+    ui.dataFetchStatus = 'fetching predefined players from server...'
+    const predefinedPlayers = await ServerApi.getInstance().fetchPredefinedPlayers()
+    if (predefinedPlayers && predefinedPlayers.length > 0) {
+        log('set predefinedPlayers', predefinedPlayers)
+        settings.predefinedPlayers = predefinedPlayers
+    } else {
+        log('no predefinedPlayers found on server, keep existing ones')
+    }
+    ui.dataFetchStatus = ''
     await navigateTo('/players')
 }
 </script>
@@ -23,6 +34,7 @@ async function startTournament() {
     <div id="start-page" class="flex min-w-full min-h-screen">
         <div class="m-auto pb-32">
             <div class="mt-12">
+                <div v-if="ui.dataFetchStatus" class="bg-blue-600 text-white">{{ ui.dataFetchStatus }}</div>
                 <div>
                     <button
                         id="start-button"

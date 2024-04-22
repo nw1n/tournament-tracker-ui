@@ -9,7 +9,7 @@ const settings = useSettingsStore()
 
 const errorMessage = ref('')
 const newPlayer = ref('')
-const inputLabel = ref(null)
+const inputLabel = ref<HTMLElement | null>(null)
 
 function addPlayer() {
     const newPlayerName = newPlayer.value.trim()
@@ -24,7 +24,9 @@ function addPlayer() {
     errorMessage.value = ''
     tournament.addPlayer(newPlayerName)
     newPlayer.value = ''
-    inputLabel.value.focus()
+    if (inputLabel.value) {
+        inputLabel.value.focus()
+    }
 }
 
 function addRandomPlayers(x) {
@@ -45,6 +47,10 @@ function add1randomPlayer() {
 }
 
 async function startTournament() {
+    if (newPlayer.value.trim()) {
+        errorMessage.value = 'Did you forget to add the player? Please press "add  player" or empty the input field.'
+        return
+    }
     if (tournament.players.length < 2) {
         errorMessage.value = 'At least 2 players are required'
         return

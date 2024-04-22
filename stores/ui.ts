@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 export const useUiStore = defineStore('ui', {
     state: () => ({
         isFullScreenMenuOpen: false,
+        dataFetchStatus: '',
     }),
     actions: {
         toggleFullScreenMenu() {

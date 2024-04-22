@@ -10,9 +10,23 @@ export class ServerApi {
         return ServerApi.instance
     }
 
-    async fetchAllServerData() {
+    async fetchTestServerData() {
         const response = await fetch(`${this.serverUrl}`)
         return await response.json()
+    }
+
+    async fetchPredefinedPlayers() {
+        const url = new URL(`predefined-players/${this.serverPassword}`, this.serverUrl)
+        console.log('fetch predefined players from url', url)
+
+        try {
+            const response = await fetch(url)
+            const data = await response.json()
+            console.log('Success fetching data from server:', data)
+            return data
+        } catch (error) {
+            console.error('Error fetching data from server', error)
+        }
     }
 
     async postTournamentData(finishedMatches: any[]) {

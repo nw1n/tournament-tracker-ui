@@ -10,7 +10,7 @@ definePageMeta({
 onMounted(() => {
     console.log('mounted')
     const fetchData = async () => {
-        const data = await ServerApi.getInstance().fetchAllServerData()
+        const data = await ServerApi.getInstance().fetchTestServerData()
         console.log(data)
     }
     fetchData()
