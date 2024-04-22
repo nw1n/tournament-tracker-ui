@@ -11,7 +11,7 @@ const errorMessage = ref('')
 const newPlayer = ref('')
 const inputLabel = ref(null)
 
-const addPlayer = () => {
+function addPlayer() {
     const newPlayerName = newPlayer.value.trim()
     if (!newPlayer.value || newPlayerName === '') {
         errorMessage.value = 'Player name is required'
@@ -27,7 +27,7 @@ const addPlayer = () => {
     inputLabel.value.focus()
 }
 
-const addRandomPlayers = (x) => {
+function addRandomPlayers(x) {
     for (let i = 0; i < x; i++) {
         const playerName = getRandomName(tournament.players.slice())
         if (playerName && !tournament.players.includes(playerName)) {
@@ -36,15 +36,15 @@ const addRandomPlayers = (x) => {
     }
 }
 
-const add12randomPlayers = () => {
+function add12randomPlayers() {
     addRandomPlayers(12)
 }
 
-const add1randomPlayer = () => {
+function add1randomPlayer() {
     addRandomPlayers(1)
 }
 
-const startTournament = async () => {
+async function startTournament() {
     if (tournament.players.length < 2) {
         errorMessage.value = 'At least 2 players are required'
         return
@@ -53,7 +53,7 @@ const startTournament = async () => {
     await navigateTo('/round')
 }
 
-const continueTournament = () => {
+function continueTournament() {
     if (newPlayer.value.trim()) {
         errorMessage.value = 'Did you forget to add the player? Please press add or empty the input field.'
         return

@@ -16,7 +16,17 @@ const timerColorVal = ref('inherit')
 
 let timer = null
 
-const clearTimerInterval = () => {
+onMounted(() => {
+    console.log(`the round component is now mounted.`)
+    initTimerRender()
+})
+
+onUnmounted(() => {
+    console.log(`the round component is now unmounted.`)
+    clearTimerInterval()
+})
+
+function clearTimerInterval() {
     if (timer) {
         try {
             clearInterval(timer)
@@ -37,7 +47,7 @@ function getTimePassedSinceStartOfCurrentRound(matches, roundNr) {
     return currentTime.getTime() - matchDateStarted.getTime()
 }
 
-const updateTimeRemaining = () => {
+function updateTimeRemaining() {
     const timePassed = getTimePassedSinceStartOfCurrentRound(tournament.matches, tournament.roundNr)
     const timeRemainingMs = settings.roundTimeInMilliSeconds - timePassed
 
@@ -55,7 +65,7 @@ const updateTimeRemaining = () => {
     }, 200)
 }
 
-const initTimerRender = () => {
+function initTimerRender() {
     clearTimerInterval()
     updateTimeRemaining()
     setTimeout(updateTimeRemaining, 1000)
@@ -64,21 +74,11 @@ const initTimerRender = () => {
     timer = setInterval(updateTimeRemaining, 10000)
 }
 
-onMounted(() => {
-    console.log(`the round component is now mounted.`)
-    initTimerRender()
-})
-
-onUnmounted(() => {
-    console.log(`the round component is now unmounted.`)
-    clearTimerInterval()
-})
-
-const initRoundEnd = () => {
+function initRoundEnd() {
     isEndRoundMenuOpen.value = true
 }
 
-const endRound = () => {
+function endRound() {
     isEndRoundMenuOpen.value = false
     tournament.endRoundAndCreateNewMatches()
     window.scrollTo({
@@ -88,24 +88,24 @@ const endRound = () => {
     initTimerRender()
 }
 
-const saveDataToServer = async () => {
+async function saveDataToServer() {
     log('saving data to server')
     const result = await ServerApi.getInstance().postTournamentData(tournament.finishedMatches)
     log('result', result)
 }
 
-const endTournament = () => {
+function endTournament() {
     tournament.endRound()
     saveDataToServer()
     navigateTo('/end')
 }
 
-const ignoreRoundAndEndTournament = () => {
+function ignoreRoundAndEndTournament() {
     saveDataToServer()
     navigateTo('/end')
 }
 
-const changePlayers = () => {
+function changePlayers() {
     navigateTo('/players')
 }
 </script>

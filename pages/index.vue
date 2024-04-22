@@ -12,7 +12,7 @@ const tournament = useTournamentStore()
 const ui = useUiStore()
 const settings = useSettingsStore()
 
-const startTournament = async () => {
+async function startTournament() {
     tournament.endAndReset()
     tournament.init()
     await navigateTo('/players')
