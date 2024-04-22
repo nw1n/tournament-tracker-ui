@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import AppNav from '@/components/AppNav.vue'
 import { useSettingsStore } from '@/stores/settings'
 

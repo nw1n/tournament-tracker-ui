@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { useTournamentStore } from '~/stores/tournament'
 
 const tournament = useTournamentStore()

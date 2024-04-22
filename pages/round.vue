@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { useTournamentStore } from '~/stores/tournament'
 import { useSettingsStore } from '@/stores/settings'
 import { log, millisecondsToTime } from '../lib/Util'
