@@ -29,7 +29,7 @@ function addPlayer() {
     }
 }
 
-function addRandomPlayers(x) {
+function addRandomPlayers(x: number) {
     for (let i = 0; i < x; i++) {
         const playerName = getRandomName(tournament.players.slice())
         if (playerName && !tournament.players.includes(playerName)) {

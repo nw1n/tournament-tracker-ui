@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useTournamentStore } from '~/stores/tournament'
 import { useSettingsStore } from '@/stores/settings'
+import { Config } from '~/lib/Config'
 
 const tournament = useTournamentStore()
 const settings = useSettingsStore()
@@ -17,7 +18,7 @@ const settings = useSettingsStore()
             <div class="mt-8">Password:</div>
             <input type="text" v-model="settings.password" class="border p-2 w-64" />
         </div>
-        <div>
+        <div v-if="Config.getInstance().isDevMode">
             <div class="mt-8">Debug Mode</div>
             <input type="checkbox" v-model="settings.isDebugMode" />
         </div>

@@ -1,5 +1,11 @@
 import type { SettingsState } from '~/stores/settings'
 
+const cacheHeaders = {
+    'Cache-Control': 'no-cache, no-store, must-revalidate',
+    Pragma: 'no-cache',
+    Expires: '0',
+}
+
 export class ServerApi {
     static instance: ServerApi
 
@@ -11,7 +17,12 @@ export class ServerApi {
     }
 
     async fetchTestServerData() {
-        const response = await fetch(`${this.serverUrl}`)
+        const response = await fetch(`${this.serverUrl}`, {
+            method: 'GET',
+            headers: {
+                ...cacheHeaders,
+            },
+        })
         return await response.json()
     }
 
@@ -20,7 +31,12 @@ export class ServerApi {
         console.log('fetch predefined players from url', url)
 
         try {
-            const response = await fetch(url)
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    ...cacheHeaders,
+                },
+            })
             const data = await response.json()
             console.log('Success fetching data from server:', data)
             return data
