@@ -7,13 +7,13 @@ export class MatchMaker {
     public store: TournamentStateExtended
     public byePlayer = ''
     public previousMeets: Map<string, number> = new Map()
-    public byeRatiosSorted: any[] = []
+    public byeRatiosOfTournamentSorted: any[] = []
     public playerPairs: string[][] = []
 
     constructor(store: TournamentStateExtended) {
         this.store = store
         this.previousMeets = getNumberOfMeetsBetweenPlayers(this.store.$state)
-        this.byeRatiosSorted = getByeRatiosSorted(this.store.$state)
+        this.byeRatiosOfTournamentSorted = getByeRatiosSorted(this.store.$state)
         this.setByePlayer()
         this.createPlayerPairs()
     }
@@ -69,7 +69,7 @@ export class MatchMaker {
     }
 
     get playerWithHighestByeRatio(): string {
-        return this.byeRatiosSorted?.length ? this.byeRatiosSorted[0].player : ''
+        return this.byeRatiosOfTournamentSorted?.length ? this.byeRatiosOfTournamentSorted[0].player : ''
     }
 }
 
