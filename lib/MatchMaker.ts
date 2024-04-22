@@ -31,11 +31,6 @@ export class MatchMaker {
         }
         const playerWithLowestRatio = ratiosFilteredForExcludedPlayers[0].player
         this.byePlayer = playerWithLowestRatio
-        // if (false) {
-        //     // set bye player to the player with the lowest bye ratio
-        //     const playerWithLowestRatio = this.byeRatiosOfTournamentSorted[0].player
-        //     this.byePlayer = playerWithLowestRatio
-        // }
     }
 
     createPlayerPairs() {
