@@ -21,11 +21,8 @@ function getByeRatios(state: any) {
     log(matchesPlayedByPlayer)
     const byeRatios = {} as any
     for (const player of state.players) {
-        byeRatios[player] = 0
-        const byes = totalByes[player]
-        const matchesPlayed = matchesPlayedByPlayer[player]
-        if (!matchesPlayed || !byes) {
-            continue
+        if (!matchesPlayedByPlayer[player]) {
+            byeRatios[player] = 1
         }
         byeRatios[player] = totalByes[player] / matchesPlayedByPlayer[player]
     }
