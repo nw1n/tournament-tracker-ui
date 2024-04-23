@@ -128,14 +128,15 @@ function continueTournament() {
                     </button>
                 </template>
             </div>
-            <div v-if="tournament.isTournamentInProgress" class="mt-12">
+            <div class="mt-8 mb-8">Number of players: {{ tournament.players.length }}</div>
+            <div v-if="tournament.isTournamentInProgress">
                 <button @click="continueTournament" id="continue-tournament-btn">Continue tournament</button>
             </div>
-            <div v-else class="mt-12">
+            <div v-else>
                 <button @click="startTournament" id="finish-player-creation-btn">Start tournament</button>
             </div>
             <div id="list-of-bye.excluded-players" class="mt-48">
-                <h1 class="mb-8">Bye-Excluded Players</h1>
+                <h1 class="mb-8">Protect players from BYE</h1>
                 <div v-for="(player, index) in tournament.players" :key="player">
                     <div>
                         <button
