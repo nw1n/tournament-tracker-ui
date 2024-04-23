@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useTournamentStore } from '~/stores/tournament'
+import { useTournamentStore, type Match } from '~/stores/tournament'
 import { useSettingsStore } from '@/stores/settings'
 import { log, millisecondsToTime } from '../lib/Util'
 import { onMounted, onUnmounted } from 'vue'
@@ -14,7 +14,7 @@ const timeRemaining = ref('00:00')
 
 const timerColorVal = ref('inherit')
 
-let timer = null
+let timerIdentifier: any = null
 
 onMounted(() => {
     console.log(`the round component is now mounted.`)
@@ -27,16 +27,16 @@ onUnmounted(() => {
 })
 
 function clearTimerInterval() {
-    if (timer) {
+    if (timerIdentifier) {
         try {
-            clearInterval(timer)
+            clearInterval(timerIdentifier)
         } catch (e) {
             console.log(e)
         }
     }
 }
 
-function getTimePassedSinceStartOfCurrentRound(matches, roundNr) {
+function getTimePassedSinceStartOfCurrentRound(matches: Match[], roundNr: number) {
     const match = matches.find((m) => m.round === roundNr)
     if (!match || !match.dateStarted) {
         console.log('no match or dateStarted found for round', roundNr, match)
@@ -71,7 +71,7 @@ function initTimerRender() {
     setTimeout(updateTimeRemaining, 1000)
     setTimeout(updateTimeRemaining, 2000)
     setTimeout(updateTimeRemaining, 3000)
-    timer = setInterval(updateTimeRemaining, 10000)
+    timerIdentifier = setInterval(updateTimeRemaining, 10000)
 }
 
 function initRoundEnd() {
