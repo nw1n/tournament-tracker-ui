@@ -15,7 +15,7 @@ export function getByeRatiosSorted(state: any) {
     return result
 }
 
-function getByeRatios(state: any) {
+function getByeRatios(state: any): any {
     const totalByes = getTotalByes(state) as any
     const matchesPlayedByPlayer = getNumberOfMatchesPlayedByPlayer(state) as any
     log(matchesPlayedByPlayer)
@@ -23,6 +23,7 @@ function getByeRatios(state: any) {
     for (const player of state.players) {
         if (!matchesPlayedByPlayer[player]) {
             byeRatios[player] = 1
+            continue
         }
         byeRatios[player] = totalByes[player] / matchesPlayedByPlayer[player]
     }
@@ -30,20 +31,20 @@ function getByeRatios(state: any) {
 }
 
 function getTotalByes(state: any) {
-    const byeRatios = {} as any
+    const totalByes = {} as any
     for (const player of state.players) {
-        byeRatios[player] = 0
+        totalByes[player] = 0
     }
     for (const match of state.matches) {
         // maybe bye player is always player2 and therefore can be made simpler
         if (match.player2 === 'BYE') {
-            byeRatios[match.player1]++
+            totalByes[match.player1]++
         }
         if (match.player1 === 'BYE') {
-            byeRatios[match.player2]++
+            totalByes[match.player2]++
         }
     }
-    return byeRatios
+    return totalByes
 }
 
 function getNumberOfMatchesPlayedByPlayer(state: any) {

@@ -23,19 +23,47 @@ export class MatchMaker {
         if (this.isEvenNumberOfPlayers || !this.byeRatiosOfTournamentSorted?.length) {
             return
         }
+
+        // filter out players that are excluded from bye
         const ratiosFilteredForExcludedPlayers = this.byeRatiosOfTournamentSorted.filter(
             (ratio) => !this.store.playersExcludedFromBye.includes(ratio.player),
         )
+
+        // if no players left, but uneven number of players, log error
         if (!ratiosFilteredForExcludedPlayers.length) {
+            console.error('no players left for bye, but uneven number of players.')
             return
         }
-        const playerWithLowestRatio = ratiosFilteredForExcludedPlayers[0].player
-        this.byePlayer = playerWithLowestRatio
+
+        // get a list of players tied for the lowest ratio
+        console.log('ratiosFilteredForExcludedPlayers', ratiosFilteredForExcludedPlayers)
+        const lowestRatio = ratiosFilteredForExcludedPlayers[0].ratio
+        const playersWithLowestRatio = ratiosFilteredForExcludedPlayers.filter((ratio) => ratio.ratio === lowestRatio)
+
+        const playerScoresSorted = this.store.allTournamentScoresSorted
+        log('playerScores', playerScoresSorted)
+
+        log('playersWithLowestRatio', playersWithLowestRatio)
+        const playerScoresSortedFilteredForLowestByeRatio = playerScoresSorted.filter((playerScore) =>
+            playersWithLowestRatio.map((ratio) => ratio.player).includes(playerScore.player),
+        )
+        log('playerScoresSortedFilteredForPlayersWithLowestRatio', playerScoresSortedFilteredForLowestByeRatio)
+        const lowestScore = _.last(playerScoresSortedFilteredForLowestByeRatio).score
+        const resultArr = playerScoresSortedFilteredForLowestByeRatio.filter(
+            (playerScore) => playerScore.score === lowestScore,
+        )
+        log('resultArr', resultArr)
+        const resultArrShuffled = _.shuffle(resultArr)
+        this.byePlayer = resultArrShuffled[0].player
     }
 
     createPlayerPairs() {
         const playersListFilteredForBye = this.store.players.filter((player) => player !== this.byePlayer)
-        const playerPairsSorted = MatchMaker.tryFindingGoodPairings(playersListFilteredForBye, this.previousMeets)
+        const playerPairsSorted = MatchMaker.tryFindingGoodPairings(
+            playersListFilteredForBye,
+            this.previousMeets,
+            this.store.allTournamentScoresSorted,
+        )
 
         // if there is a bye player, add it to the end of the array
         if (this.byePlayer) {
@@ -45,19 +73,70 @@ export class MatchMaker {
         this.playerPairs = playerPairsSorted
     }
 
-    static tryFindingGoodPairings(playersList: string[], meets: Map<string, number>) {
+    static tryFindingGoodPairings(playersList: string[], meets: Map<string, number>, playerScores: any[]) {
         let playerPairsSorted: string[][] = []
-        const maxTries = 100000
+        const maxTries = 300
+        const playersScoreClone = playerScores.slice()
 
         for (let i = 0; i < maxTries; i++) {
-            // shuffle players
-            const playersCloneShuffled = _.shuffle(playersList)
+            // sort by score
+            const tmp = playersList.map((player) => {
+                return playersScoreClone.find((p) => p.player === player)
+            })
+            console.log('tmp', tmp)
+            const tmpShuffled = _.shuffle(tmp)
+            const tmpShuffledSorted = tmpShuffled.sort((a, b) => b.score - a.score)
+            console.log('tmpShuffledSorted', tmpShuffledSorted)
+            const tmpShuffledSortedPlayerNames = tmpShuffledSorted.map((p) => p.player)
+            console.log('tmpShuffledSortedPlayerNames', tmpShuffledSortedPlayerNames)
 
-            // TODO: sort by score
-            // const playersCloneShuffledSortedByScore = ...
+            //const playersCloneShuffledSortedByScore = null
 
             // create player pairs that are each sorted alphabetically
-            playerPairsSorted = _.chunk(playersCloneShuffled, 2).map((pair) => pair.sort())
+            // playerPairsSorted = _.chunk(tmpShuffledSortedPlayerNames, 2).map((pair) => pair.sort())
+
+            // for (let j = 0; j < tmpShuffledSortedPlayerNames.length - 1; j += 1) {
+            //     const player1 = tmpShuffledSortedPlayerNames[j]
+            //     for (let k = j + 1; k < tmpShuffledSortedPlayerNames.length; k += 1) {
+            //         const player2 = tmpShuffledSortedPlayerNames[k]
+            //         if (player1 === player2) {
+            //             continue
+            //         }
+            //         const pair = [player1, player2].sort()
+            //         if (isPlayerPairsFreeOfPairsThatPlayedBefore([pair], meets)) {
+            //             playerPairsSorted.push(pair)
+            //             break
+            //         }
+            //     }
+            // }
+
+            for (let j = 0; j < tmpShuffledSortedPlayerNames.length; j += 1) {
+                const player1 = tmpShuffledSortedPlayerNames[j]
+                for (let k = 0; k < tmpShuffledSortedPlayerNames.length; k += 1) {
+                    const player2 = tmpShuffledSortedPlayerNames[k]
+                    if (player1 === player2) {
+                        continue
+                    }
+
+                    // check for potential dupllcates in this round
+                    const playerPairsSortedFlat = playerPairsSorted.flat()
+                    if (playerPairsSortedFlat.includes(player1) || playerPairsSortedFlat.includes(player2)) {
+                        continue
+                    }
+
+                    // check if the players have met before in previous rounds
+                    const pair = [player1, player2].sort()
+                    if (isPlayerPairsFreeOfPairsThatPlayedBefore([pair], meets)) {
+                        playerPairsSorted.push(pair)
+                    }
+                }
+            }
+
+            // check if correct number of pairs are created
+            if (playerPairsSorted.length !== playersList.length / 2) {
+                playerPairsSorted = []
+                continue
+            }
 
             // check if players have met too many times
             if (isPlayerPairsFreeOfPairsThatPlayedBefore(playerPairsSorted, meets)) {
@@ -66,9 +145,10 @@ export class MatchMaker {
             }
         }
 
-        log('no unique matchups found. use repeated matchups. used tries: ' + maxTries)
+        log(`no unique matchups found. used tries: ${maxTries}. Use random matchups instead.`)
 
-        // tmp solution: if no unique matchups are found, return the last created pairs
+        // if no solution found, return a random solution
+        playerPairsSorted = _.chunk(_.shuffle(playersList), 2).map((pair) => pair.sort())
         return playerPairsSorted
     }
 

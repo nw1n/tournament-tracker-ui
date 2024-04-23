@@ -26,6 +26,8 @@ export interface TournamentState {
 
 export interface TournamentStateExtended extends TournamentState {
     $state: TournamentState
+    // getters
+    allTournamentScoresSorted: any[]
 }
 
 export const useTournamentStore = defineStore('tournament', {
