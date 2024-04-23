@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useTournamentStore, type Match } from '~/stores/tournament'
 import { useSettingsStore } from '@/stores/settings'
-import { log, millisecondsToTime } from '../lib/Util'
+import { log, millisecondsToTime, sleep } from '../lib/Util'
 import { onMounted, onUnmounted } from 'vue'
 import { ServerApi } from '~/lib/ServerApi'
 
@@ -59,19 +59,20 @@ function updateTimeRemaining() {
     }
 
     timeRemaining.value = millisecondsToTime(timeRemainingMs)
-    timerColorVal.value = '#888'
-    setTimeout(() => {
-        timerColorVal.value = 'inherit'
-    }, 200)
+    // timerColorVal.value = '#888'
+    // setTimeout(() => {
+    //     timerColorVal.value = 'inherit'
+    // }, 200)
 }
 
-function initTimerRender() {
+async function initTimerRender() {
     clearTimerInterval()
     updateTimeRemaining()
-    setTimeout(updateTimeRemaining, 1000)
-    setTimeout(updateTimeRemaining, 2000)
-    setTimeout(updateTimeRemaining, 3000)
-    timerIdentifier = setInterval(updateTimeRemaining, 10000)
+    for (let i = 0; i < 59; i++) {
+        await sleep(1000)
+        updateTimeRemaining()
+    }
+    timerIdentifier = setInterval(updateTimeRemaining, 30000)
 }
 
 function initRoundEnd() {
