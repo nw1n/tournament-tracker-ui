@@ -1,0 +1,15 @@
+{
+    "background_color": "white",
+    "description": "w1 Tournament Tracker",
+    "display": "fullscreen",
+    "icons": [
+        {
+            "src": "images/logo.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        }
+    ],
+    "name": "w1 Tournament",
+    "short_name": "w1 Tournament",
+    "start_url": "/"
+}
