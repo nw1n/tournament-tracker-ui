@@ -1,7 +1,6 @@
 import _ from 'lodash'
 import type { Match, TournamentStateExtended } from '../stores/tournament'
-import { log } from '~/lib/Util'
-import { getByeRatiosSorted } from './ByeRatios'
+import { insertionSortObjs, log } from '~/lib/Util'
 
 export class MatchMaker {
     public store: TournamentStateExtended
@@ -90,26 +89,6 @@ export class MatchMaker {
             const tmpShuffledSortedPlayerNames = tmpShuffledSorted.map((p) => p.player)
             console.log('tmpShuffledSortedPlayerNames', tmpShuffledSortedPlayerNames)
 
-            //const playersCloneShuffledSortedByScore = null
-
-            // create player pairs that are each sorted alphabetically
-            // playerPairsSorted = _.chunk(tmpShuffledSortedPlayerNames, 2).map((pair) => pair.sort())
-
-            // for (let j = 0; j < tmpShuffledSortedPlayerNames.length - 1; j += 1) {
-            //     const player1 = tmpShuffledSortedPlayerNames[j]
-            //     for (let k = j + 1; k < tmpShuffledSortedPlayerNames.length; k += 1) {
-            //         const player2 = tmpShuffledSortedPlayerNames[k]
-            //         if (player1 === player2) {
-            //             continue
-            //         }
-            //         const pair = [player1, player2].sort()
-            //         if (isPlayerPairsFreeOfPairsThatPlayedBefore([pair], meets)) {
-            //             playerPairsSorted.push(pair)
-            //             break
-            //         }
-            //     }
-            // }
-
             for (let j = 0; j < tmpShuffledSortedPlayerNames.length; j += 1) {
                 const player1 = tmpShuffledSortedPlayerNames[j]
                 for (let k = 0; k < tmpShuffledSortedPlayerNames.length; k += 1) {
@@ -170,6 +149,8 @@ function isPlayerPairsFreeOfPairsThatPlayedBefore(playerPairs: string[][], previ
     return true
 }
 
+// ------------------------------------------------------------------------------------------------
+// bye-functions
 function getNumberOfMeetsBetweenPlayers(state: any): Map<string, number> {
     const meets = new Map<string, number>()
 
@@ -182,4 +163,72 @@ function getNumberOfMeetsBetweenPlayers(state: any): Map<string, number> {
     }
 
     return meets
+}
+
+function getByeRatiosSorted(state: any) {
+    const src = getByeRatios(state)
+    let result = [] as any[]
+    for (const player of Object.keys(src)) {
+        result.push({
+            player,
+            ratio: src[player],
+        })
+    }
+    result = _.shuffle(result)
+    result = insertionSortObjs(result, 'ratio')
+    return result
+}
+
+function getByeRatios(state: any): any {
+    const totalByes = getTotalByes(state) as any
+    const matchesPlayedByPlayer = getNumberOfMatchesPlayedByPlayer(state) as any
+    log(matchesPlayedByPlayer)
+    const byeRatios = {} as any
+    for (const player of state.players) {
+        if (!matchesPlayedByPlayer[player]) {
+            byeRatios[player] = 1
+            continue
+        }
+        byeRatios[player] = totalByes[player] / matchesPlayedByPlayer[player]
+    }
+    return byeRatios
+}
+
+function getTotalByes(state: any) {
+    const totalByes = {} as any
+    for (const player of state.players) {
+        totalByes[player] = 0
+    }
+    for (const match of state.matches) {
+        // maybe bye player is always player2 and therefore can be made simpler
+        if (match.player2 === 'BYE') {
+            totalByes[match.player1]++
+        }
+        if (match.player1 === 'BYE') {
+            totalByes[match.player2]++
+        }
+    }
+    return totalByes
+}
+
+function getNumberOfMatchesPlayedByPlayer(state: any) {
+    const matchesPlayed = {} as any
+    const matches = state.matches.filter((m: Match) => m.round <= state.finishedRoundNr)
+    for (const match of matches) {
+        if (match.player1 !== 'BYE') {
+            const playerName = match.player1
+            if (!matchesPlayed[playerName]) {
+                matchesPlayed[playerName] = 0
+            }
+            matchesPlayed[playerName]++
+        }
+        if (match.player2 !== 'BYE') {
+            const playerName = match.player2
+            if (!matchesPlayed[playerName]) {
+                matchesPlayed[playerName] = 0
+            }
+            matchesPlayed[playerName]++
+        }
+    }
+    return matchesPlayed
 }
