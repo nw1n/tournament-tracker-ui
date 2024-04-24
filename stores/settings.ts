@@ -8,15 +8,17 @@ export interface SettingsState {
     roundTimeMinutes: number
     isDebugMode: boolean
     predefinedPlayers: string[]
+    byeMode: 'by-score' | 'not-by-score'
 }
 
 export const useSettingsStore = defineStore('settings', {
     state: () => ({
         serverUrl: 'http://localhost:5000',
         password: '',
-        roundTimeMinutes: 30,
+        roundTimeMinutes: 40,
         isDebugMode: false,
         predefinedPlayers: ['Alice', 'Bob', 'Charlie', 'David'], // TMP
+        byeMode: 'by-score',
     }),
     getters: {
         roundTimeInMilliSeconds: (state) => {

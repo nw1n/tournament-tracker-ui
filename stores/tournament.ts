@@ -65,7 +65,7 @@ export const useTournamentStore = defineStore('tournament', {
         },
 
         createMatchesForRound() {
-            const matchMaker = new MatchMaker(this)
+            const matchMaker = new MatchMaker(this, 'not-by-score')
 
             const newMatches = matchMaker.playerPairs.map((pair) => ({
                 round: this.roundNr,

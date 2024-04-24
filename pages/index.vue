@@ -48,6 +48,17 @@ async function startTournament() {
                     <div class="mb-2">Round length in Minutes</div>
                     <input type="number" v-model="settings.roundTimeMinutes" class="border p-2 w-24" />
                 </div>
+                <div class="bg-white p-3 mt-6">
+                    <div class="mb-2">
+                        <label for="byeModeSelect">Prioritize lowest scored players for BYE?</label>
+                    </div>
+                    <div class="">
+                        <select id="byeModeSelect" v-model="settings.byeMode">
+                            <option value="by-score">Yes (default)</option>
+                            <option value="not-by-score">No, give random BYE</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="pt-6">
                     <NuxtLink to="/settings"><button>Settings</button></NuxtLink>
                 </div>

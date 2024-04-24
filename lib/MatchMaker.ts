@@ -8,9 +8,11 @@ export class MatchMaker {
     public previousMeets: Map<string, number> = new Map()
     public byeRatiosOfTournamentSorted: any[] = []
     public playerPairs: string[][] = []
+    public byeMode: 'by-score' | 'not-by-score'
 
-    constructor(store: TournamentStateExtended) {
+    constructor(store: TournamentStateExtended, byeMode: 'by-score' | 'not-by-score') {
         this.store = store
+        this.byeMode = byeMode
         this.previousMeets = getNumberOfMeetsBetweenPlayers(this.store.$state)
         this.byeRatiosOfTournamentSorted = getByeRatiosSorted(this.store.$state)
         this.setByePlayer()
@@ -39,21 +41,33 @@ export class MatchMaker {
         const lowestRatio = ratiosFilteredForExcludedPlayers[0].ratio
         const playersWithLowestRatio = ratiosFilteredForExcludedPlayers.filter((ratio) => ratio.ratio === lowestRatio)
 
-        const playerScoresSorted = this.store.allTournamentScoresSorted
-        log('playerScores', playerScoresSorted)
+        if (this.byeMode === 'not-by-score') {
+            log('MODE: set bye player not by score, but random')
+            const shuffledPlayersWithLowestRatio = _.shuffle(playersWithLowestRatio.slice())
+            this.byePlayer = shuffledPlayersWithLowestRatio[0].player
+            return
+        }
 
-        log('playersWithLowestRatio', playersWithLowestRatio)
-        const playerScoresSortedFilteredForLowestByeRatio = playerScoresSorted.filter((playerScore) =>
-            playersWithLowestRatio.map((ratio) => ratio.player).includes(playerScore.player),
-        )
-        log('playerScoresSortedFilteredForPlayersWithLowestRatio', playerScoresSortedFilteredForLowestByeRatio)
-        const lowestScore = _.last(playerScoresSortedFilteredForLowestByeRatio).score
-        const resultArr = playerScoresSortedFilteredForLowestByeRatio.filter(
-            (playerScore) => playerScore.score === lowestScore,
-        )
-        log('resultArr', resultArr)
-        const resultArrShuffled = _.shuffle(resultArr)
-        this.byePlayer = resultArrShuffled[0].player
+        if (this.byeMode === 'by-score') {
+            log('MODE: set bye player by score')
+
+            // use player scores for bye selection
+            const playerScoresSorted = this.store.allTournamentScoresSorted
+            log('playerScores', playerScoresSorted)
+
+            log('playersWithLowestRatio', playersWithLowestRatio)
+            const playerScoresSortedFilteredForLowestByeRatio = playerScoresSorted.filter((playerScore) =>
+                playersWithLowestRatio.map((ratio) => ratio.player).includes(playerScore.player),
+            )
+            log('playerScoresSortedFilteredForPlayersWithLowestRatio', playerScoresSortedFilteredForLowestByeRatio)
+            const lowestScore = _.last(playerScoresSortedFilteredForLowestByeRatio).score
+            const resultArr = playerScoresSortedFilteredForLowestByeRatio.filter(
+                (playerScore) => playerScore.score === lowestScore,
+            )
+            log('resultArr', resultArr)
+            const resultArrShuffled = _.shuffle(resultArr)
+            this.byePlayer = resultArrShuffled[0].player
+        }
     }
 
     createPlayerPairs() {
