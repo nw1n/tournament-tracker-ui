@@ -3,6 +3,8 @@ import { formatTime, insertionSortObjs, log } from '~/lib/Util'
 import _ from 'lodash'
 import { changeScore, getAllTournamentScores } from '~/lib/TournamentStoreFn'
 import { MatchMaker } from '~/lib/MatchMaker'
+import type { SettingsState } from './settings'
+import { useSettingsStore } from './settings'
 
 export interface Match {
     round: number
@@ -65,7 +67,8 @@ export const useTournamentStore = defineStore('tournament', {
         },
 
         createMatchesForRound() {
-            const matchMaker = new MatchMaker(this, 'not-by-score')
+            const settings = useSettingsStore() as SettingsState
+            const matchMaker = new MatchMaker(this, settings.byeMode || 'by-score')
 
             const newMatches = matchMaker.playerPairs.map((pair) => ({
                 round: this.roundNr,
