@@ -37,7 +37,6 @@ export class MatchMaker {
         }
 
         // get a list of players tied for the lowest ratio
-        console.log('ratiosFilteredForExcludedPlayers', ratiosFilteredForExcludedPlayers)
         const lowestRatio = ratiosFilteredForExcludedPlayers[0].ratio
         const playersWithLowestRatio = ratiosFilteredForExcludedPlayers.filter((ratio) => ratio.ratio === lowestRatio)
 
@@ -54,17 +53,13 @@ export class MatchMaker {
             // use player scores for bye selection
             const playerScoresSorted = this.store.allTournamentScoresSorted
             log('playerScores', playerScoresSorted)
-
-            log('playersWithLowestRatio', playersWithLowestRatio)
             const playerScoresSortedFilteredForLowestByeRatio = playerScoresSorted.filter((playerScore) =>
                 playersWithLowestRatio.map((ratio) => ratio.player).includes(playerScore.player),
             )
-            log('playerScoresSortedFilteredForPlayersWithLowestRatio', playerScoresSortedFilteredForLowestByeRatio)
             const lowestScore = _.last(playerScoresSortedFilteredForLowestByeRatio).score
             const resultArr = playerScoresSortedFilteredForLowestByeRatio.filter(
                 (playerScore) => playerScore.score === lowestScore,
             )
-            log('resultArr', resultArr)
             const resultArrShuffled = _.shuffle(resultArr)
             this.byePlayer = resultArrShuffled[0].player
         }
@@ -96,12 +91,9 @@ export class MatchMaker {
             const tmp = playersList.map((player) => {
                 return playersScoreClone.find((p) => p.player === player)
             })
-            console.log('tmp', tmp)
             const tmpShuffled = _.shuffle(tmp)
             const tmpShuffledSorted = tmpShuffled.sort((a, b) => b.score - a.score)
-            console.log('tmpShuffledSorted', tmpShuffledSorted)
             const tmpShuffledSortedPlayerNames = tmpShuffledSorted.map((p) => p.player)
-            console.log('tmpShuffledSortedPlayerNames', tmpShuffledSortedPlayerNames)
 
             for (let j = 0; j < tmpShuffledSortedPlayerNames.length; j += 1) {
                 const player1 = tmpShuffledSortedPlayerNames[j]

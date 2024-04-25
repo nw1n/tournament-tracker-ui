@@ -17,12 +17,10 @@ const timerColorVal = ref('inherit')
 let timerIdentifier: any = null
 
 onMounted(() => {
-    console.log(`the round component is now mounted.`)
     initTimerRender()
 })
 
 onUnmounted(() => {
-    console.log(`the round component is now unmounted.`)
     clearTimerInterval()
 })
 
@@ -97,11 +95,13 @@ async function saveDataToServer() {
 
 function endTournament() {
     tournament.endRound()
+    log(JSON.parse(JSON.stringify(tournament.finishedMatches)))
     saveDataToServer()
     navigateTo('/end')
 }
 
 function ignoreRoundAndEndTournament() {
+    log(JSON.parse(JSON.stringify(tournament.finishedMatches)))
     saveDataToServer()
     navigateTo('/end')
 }
