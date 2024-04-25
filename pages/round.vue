@@ -126,8 +126,8 @@ function changePlayers() {
                     </div>
                     <div class="pt-6">
                         Time Remaining:
-                        <div class="pt-2 pb-4">
-                            <span id="timer-time" class="text-6xl mr-8" :style="{ color: timerColorVal }">{{
+                        <div class="pt-2 pb-4 flex justify-between items-end">
+                            <span id="timer-time" class="text-5xl min-w-36" :style="{ color: timerColorVal }">{{
                                 timeRemaining
                             }}</span>
                             <button @click="updateTimeRemaining">update time</button>
