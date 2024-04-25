@@ -15,7 +15,7 @@ export const useSettingsStore = defineStore('settings', {
     state: () => ({
         serverUrl: 'http://localhost:5000',
         password: '',
-        roundTimeMinutes: 40,
+        roundTimeMinutes: 50,
         isDebugMode: false,
         predefinedPlayers: ['Alice', 'Bob', 'Charlie', 'David'], // TMP
         byeMode: 'by-score',
