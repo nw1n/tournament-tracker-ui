@@ -1,8 +1,10 @@
 # Tournament Tracker Frontend
 
-This is the frontend repo of the Tournament Tracker app.
+This tournament tracker app is designed for running a game tournament. It was orignally built for MTG tournaments, but can be used for any kind of tournament with 1v1 games. It can be used as a PWA or directly in the browser.
 
-Use it as website or PWA, live hosted here:
+This repo is the frontend repo of the Tournament Tracker app.
+
+Live hosted here:
 
 [https://tournament-tracker-frontend.pages.dev/](https://tournament-tracker-frontend.pages.dev/)
 
