@@ -9,11 +9,12 @@ const tournament = useTournamentStore()
 const settings = useSettingsStore()
 
 const isEndRoundMenuOpen = ref(false)
+
 const timeRemaining = ref('00:00')
+
 const timerColorVal = ref('inherit')
+
 const dateStarted = ref(0)
-const isPaused = ref(false)
-const totalTimePaused = ref(0)
 
 let timerIdentifier: any = null
 
@@ -36,15 +37,6 @@ function clearTimerInterval() {
     }
 }
 
-function pauseTimer() {
-    isPaused.value = true
-}
-
-function unPauseTimer() {
-    isPaused.value = false
-    initTimerRender()
-}
-
 function updateDateStarted() {
     const matches = tournament.matches
     const roundNr = tournament.roundNr
@@ -63,10 +55,6 @@ function updateTimeRemaining() {
     const timePassed = Date.now() - dateStarted.value
     const timeRemainingMs = settings.roundTimeInMilliSeconds - timePassed
     timeRemaining.value = millisecondsToTime(timeRemainingMs)
-
-    if (isPaused.value === true) {
-        console.log('is paused')
-    }
 
     if (timeRemainingMs < 1) {
         timerColorVal.value = '#ff5555'
