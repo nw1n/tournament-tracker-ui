@@ -76,7 +76,7 @@ export const useTournamentStore = defineStore('tournament', {
                 player2: pair[1],
                 score1: pair[1] === 'BYE' ? 9 : 0,
                 score2: 0,
-                dateStarted: Date.now(),
+                dateStarted: 0,
                 tournamentId: this.id,
             }))
 

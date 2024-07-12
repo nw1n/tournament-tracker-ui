@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { useTournamentStore, type Match } from '~/stores/tournament'
+import { useTournamentStore } from '~/stores/tournament'
 import { useSettingsStore } from '@/stores/settings'
 import { log, millisecondsToTime, sleep } from '../lib/Util'
 import { onMounted, onUnmounted } from 'vue'
 import { ServerApi } from '~/lib/ServerApi'
+import type { Match } from '~/stores/tournament'
 
 const tournament = useTournamentStore()
 const settings = useSettingsStore()
@@ -18,14 +19,52 @@ const dateStarted = ref(0)
 
 let timerIdentifier: any = null
 
+const getFirstMatchOfCurrentRound = computed(() => {
+    const matches = tournament.matches
+    const roundNr = tournament.roundNr
+    const match = matches.find((m) => m.round === roundNr)
+    if (match) {
+        return match
+    }
+})
+
+const isTimerStarted = computed(() => {
+    const match = getFirstMatchOfCurrentRound.value
+    if (match && match.dateStarted) {
+        console.log('Match was already started')
+        return true
+    }
+    console.log('Match was not started yet')
+    return false
+})
+
 onMounted(() => {
     updateDateStarted()
-    initTimerRender()
+    if (isTimerStarted.value) {
+        initTimerRender()
+    } else {
+        timeRemaining.value = millisecondsToTime(settings.roundTimeInMilliSeconds)
+    }
 })
 
 onUnmounted(() => {
     clearTimerInterval()
 })
+
+function startTimer() {
+    changeDateStartedOfMatchesToNow()
+    updateDateStarted()
+    initTimerRender()
+}
+
+function changeDateStartedOfMatchesToNow() {
+    const roundNr = tournament.roundNr
+    const matches = tournament.matchesByRound(roundNr)
+    const dateStarted = Date.now()
+    matches.forEach((match) => {
+        match.dateStarted = dateStarted
+    })
+}
 
 function clearTimerInterval() {
     if (timerIdentifier) {
@@ -38,11 +77,9 @@ function clearTimerInterval() {
 }
 
 function updateDateStarted() {
-    const matches = tournament.matches
-    const roundNr = tournament.roundNr
-    const match = matches.find((m) => m.round === roundNr)
+    const match = getFirstMatchOfCurrentRound.value
     if (!match || !match.dateStarted) {
-        console.log('no match or dateStarted found for round', roundNr, match)
+        console.log('no match or dateStarted found for round', tournament.roundNr, match)
         return 0
     }
     const result = match.dateStarted
@@ -80,7 +117,9 @@ function endRound() {
         top: 0,
         behavior: 'instant',
     })
-    initTimerRender()
+    clearTimerInterval()
+    timeRemaining.value = millisecondsToTime(settings.roundTimeInMilliSeconds)
+
 }
 
 async function saveDataToServer() {
@@ -114,6 +153,9 @@ function changePlayers() {
                 <h3>
                     Round <strong>{{ tournament.roundNr }}</strong>
                 </h3>
+                <div v-if="!isTimerStarted">
+                    <button @click="startTimer">Start Timer</button>
+                </div>
                 <div class="text-xs text-gray-600 mt-2">
                     <div>Round started at: {{ tournament.timeCurrentRoundStarted }}</div>
                     <div>
@@ -126,7 +168,7 @@ function changePlayers() {
                             <span id="timer-time" class="text-5xl min-w-36" :style="{ color: timerColorVal }">{{
                                 timeRemaining
                             }}</span>
-                            <button @click="updateTimeRemaining">update time</button>
+                            <button v-if="isTimerStarted" @click="updateTimeRemaining">update time</button>
                         </div>
                     </div>
                 </div>
@@ -156,7 +198,7 @@ function changePlayers() {
                     </div>
                 </div>
             </div>
-            <div class="mt-12">
+            <div class="mt-12" v-if="isTimerStarted">
                 <div v-if="!isEndRoundMenuOpen">
                     <button @click="initRoundEnd" class="border bg-sky-700 text-white p-2 hover:bg-sky-400 text-2xl">
                         End Round
