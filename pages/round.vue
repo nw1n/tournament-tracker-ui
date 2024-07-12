@@ -4,7 +4,6 @@ import { useSettingsStore } from '@/stores/settings'
 import { log, millisecondsToTime, sleep } from '../lib/Util'
 import { onMounted, onUnmounted } from 'vue'
 import { ServerApi } from '~/lib/ServerApi'
-import type { Match } from '~/stores/tournament'
 
 const tournament = useTournamentStore()
 const settings = useSettingsStore()
@@ -119,7 +118,6 @@ function endRound() {
     })
     clearTimerInterval()
     timeRemaining.value = millisecondsToTime(settings.roundTimeInMilliSeconds)
-
 }
 
 async function saveDataToServer() {
