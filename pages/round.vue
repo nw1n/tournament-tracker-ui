@@ -54,25 +54,19 @@ function updateDateStarted() {
 function updateTimeRemaining() {
     const timePassed = Date.now() - dateStarted.value
     const timeRemainingMs = settings.roundTimeInMilliSeconds - timePassed
+    timeRemaining.value = millisecondsToTime(timeRemainingMs)
 
-    if (timeRemainingMs < 0) {
-        timeRemaining.value = '00:00'
+    if (timeRemainingMs < 1) {
         timerColorVal.value = '#ff5555'
         clearTimerInterval()
         return
     }
-
-    timeRemaining.value = millisecondsToTime(timeRemainingMs)
 }
 
 async function initTimerRender() {
     clearTimerInterval()
     updateTimeRemaining()
-    for (let i = 0; i < 59; i++) {
-        await sleep(1000)
-        updateTimeRemaining()
-    }
-    timerIdentifier = setInterval(updateTimeRemaining, 30000)
+    timerIdentifier = setInterval(updateTimeRemaining, 1000)
 }
 
 function initRoundEnd() {
