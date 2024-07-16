@@ -5,6 +5,8 @@ import { log, millisecondsToTime, sleep } from '../lib/Util'
 import { onMounted, onUnmounted } from 'vue'
 import { ServerApi } from '~/lib/ServerApi'
 
+const RED_COLOR = '#ff5555'
+
 const tournament = useTournamentStore()
 const settings = useSettingsStore()
 
@@ -93,7 +95,7 @@ function updateTimeRemaining() {
     timeRemaining.value = millisecondsToTime(timeRemainingMs)
 
     if (timeRemainingMs < 1) {
-        timerColorVal.value = '#ff5555'
+        timerColorVal.value = RED_COLOR
         clearTimerInterval()
         return
     }
@@ -117,6 +119,7 @@ function endRound() {
         behavior: 'instant',
     })
     clearTimerInterval()
+    timerColorVal.value = 'inherit'
     timeRemaining.value = millisecondsToTime(settings.roundTimeInMilliSeconds)
 }
 
