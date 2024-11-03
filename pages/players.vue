@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useTournamentStore } from '~/stores/tournament'
-import { useSettingsStore } from '~/stores/settings'
-import { getRandomName } from '~/lib/getRandomNameForTesting'
 import { Config } from '@/lib/Config'
+import { getRandomName } from '~/lib/getRandomNameForTesting'
+import { useSettingsStore } from '~/stores/settings'
+import { useTournamentStore } from '~/stores/tournament'
 
 const tournament = useTournamentStore()
 const settings = useSettingsStore()
@@ -65,6 +65,10 @@ function continueTournament() {
         return
     }
     navigateTo('/round')
+}
+
+function goBackToHomeScreen() {
+    navigateTo('/')
 }
 </script>
 
@@ -135,7 +139,11 @@ function continueTournament() {
             <div v-else>
                 <button @click="startTournament" id="finish-player-creation-btn">Start tournament</button>
             </div>
-            <div id="list-of-bye.excluded-players" class="mt-48">
+            <div v-if="!tournament.isTournamentInProgress">
+                <br /><br /><br /><br />
+                <button @click="goBackToHomeScreen">Cancel</button>
+            </div>
+            <div id="list-of-bye.excluded-players" class="mt-32">
                 <h1 class="mb-8">Protect players from BYE</h1>
                 <div v-for="(player, index) in tournament.players" :key="player">
                     <div>
