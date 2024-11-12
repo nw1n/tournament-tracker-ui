@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { useTournamentStore } from '~/stores/tournament'
 import { useSettingsStore } from '@/stores/settings'
-import { log, millisecondsToTime, sleep } from '../lib/Util'
 import { onMounted, onUnmounted } from 'vue'
 import { ServerApi } from '~/lib/ServerApi'
+import { useTournamentStore } from '~/stores/tournament'
+import { log, millisecondsToTime } from '../lib/Util'
 
 const RED_COLOR = '#ff5555'
 
@@ -111,9 +111,16 @@ function initRoundEnd() {
     isEndRoundMenuOpen.value = true
 }
 
+function endRoundAndCreateNewMatches() {
+    tournament.endRound()
+    saveDataToServer()
+    tournament.incrementRoundNr()
+    tournament.createMatchesForRound()
+}
+
 function endRound() {
     isEndRoundMenuOpen.value = false
-    tournament.endRoundAndCreateNewMatches()
+    endRoundAndCreateNewMatches()
     window.scrollTo({
         top: 0,
         behavior: 'instant',
